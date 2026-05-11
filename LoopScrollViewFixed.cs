@@ -5,7 +5,6 @@ using static UnityEngine.UI.ScrollRect;
 public class LoopScrollViewFixed : LoopScrollViewOneDirection
 {
     public float size;
-    public float spacing;
 
     protected override float normalizedValue
     {
@@ -37,13 +36,6 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
     }
 
     private float totalSize, itemOffset;
-
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        if (scrollbar)
-            scrollbar.onValueChanged.AddListener(SetNormalizedPosition);
-    }
 
     protected override void Refill()
     {

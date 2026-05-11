@@ -59,6 +59,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
 
     [SerializeField]
     private ScrollbarVisibility m_ScrollbarVisibility;
+    public float spacing;
     public ScrollbarVisibility scrollbarVisibility
     {
         get => m_ScrollbarVisibility;
@@ -143,6 +144,13 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
     }
 
     protected abstract void SetNormalizedPosition(float value);
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        if (scrollbar)
+            scrollbar.onValueChanged.AddListener(SetNormalizedPosition);
+    }
 
     protected override void OnDisable()
     {
