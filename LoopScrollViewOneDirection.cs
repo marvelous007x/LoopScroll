@@ -113,6 +113,38 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
         }
     }
 
+    protected override void SetContentAnchoredPosition(Vector2 position, bool jump = false)
+    {
+        Vector2 currentPosition = content.anchoredPosition;
+        bool forward;
+        if (horizontal)
+        {
+            if (position.x == currentPosition.x) return;
+            forward = position.x < currentPosition.x;
+            position.y = currentPosition.y;
+        }
+        else
+        {
+            if (position.y == currentPosition.y) return;
+            forward = position.y > currentPosition.y;
+            position.x = currentPosition.x;
+        }
+
+        if (forward)
+        {
+            ReleaseForwards(position);
+            RepositionContent(position);
+            InstantiateForwards(jump);
+        }
+        else
+        {
+            ReleaseBackwards(position);
+            RepositionContent(position);
+            InstantiateBackwards(jump);
+        }
+        UpdateContentBounds();
+    }
+
     protected void RepositionContent(in Vector2 position)
     {
         Vector2 offset = Vector2.zero;
@@ -143,6 +175,10 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
         m_VirtualContentOffset += offset;
     }
 
+    protected abstract void ReleaseForwards(in Vector2 position);
+    protected abstract void InstantiateForwards(bool jump = false);
+    protected abstract void ReleaseBackwards(in Vector2 position);
+    protected abstract void InstantiateBackwards(bool jump = false);
     protected abstract void SetNormalizedPosition(float value);
 
     protected override void OnEnable()

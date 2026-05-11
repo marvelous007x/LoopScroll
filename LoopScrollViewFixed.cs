@@ -48,7 +48,7 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         UpdatePrevData();
     }
 
-    private void ReleaseForwards(in Vector2 position)
+    protected override void ReleaseForwards(in Vector2 position)
     {
         var count = content.childCount;
         if (count == 0) return;
@@ -89,7 +89,7 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         }
     }
 
-    private void InstantiateForwards(bool jump = false)
+    protected override void InstantiateForwards(bool jump = false)
     {
         if (totalCount == 0) return;
         bool hl = horizontal;
@@ -156,7 +156,7 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         }
     }
 
-    private void ReleaseBackwards(in Vector2 position)
+    protected override void ReleaseBackwards(in Vector2 position)
     {
         var count = content.childCount;
         if (count == 0) return;
@@ -201,7 +201,7 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         }
     }
 
-    private void InstantiateBackwards(bool jump = false)
+    protected override void InstantiateBackwards(bool jump = false)
     {
         if (totalCount == 0) return;
         bool hl = horizontal;
@@ -266,38 +266,6 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
             onRefreshItem?.Invoke(startIndex, item);
             startValue -= offset;
         }
-    }
-
-    protected override void SetContentAnchoredPosition(Vector2 position, bool jump = false)
-    {
-        Vector2 currentPosition = content.anchoredPosition;
-        bool forward;
-        if (horizontal)
-        {
-            if (position.x == currentPosition.x) return;
-            forward = position.x < currentPosition.x;
-            position.y = currentPosition.y;
-        }
-        else
-        {
-            if (position.y == currentPosition.y) return;
-            forward = position.y > currentPosition.y;
-            position.x = currentPosition.x;
-        }
-
-        if (forward)
-        {
-            ReleaseForwards(position);
-            RepositionContent(position);
-            InstantiateForwards(jump);
-        }
-        else
-        {
-            ReleaseBackwards(position);
-            RepositionContent(position);
-            InstantiateBackwards(jump);
-        }
-        UpdateContentBounds();
     }
 
     protected override void UpdateContentBounds()
