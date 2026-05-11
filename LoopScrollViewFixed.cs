@@ -57,12 +57,12 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         if (hl)
         {
             value = position.x + content.rect.xMin;
-            value += GetRectRight(content.GetChild(0) as RectTransform);
+            value += ((RectTransform)content.GetChild(0)).GetAnchoredRight();
         }
         else
         {
             value = position.y + content.rect.yMax;
-            value += GetRectBottom(content.GetChild(0) as RectTransform);
+            value += ((RectTransform)content.GetChild(0)).GetAnchoredBottom();
         }
         for (int i = 0; i < count; i++)
         {
@@ -101,7 +101,7 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         if (count > 0)
         {
             var rt = content.GetChild(count - 1) as RectTransform;
-            startValue = hl ? GetRectLeft(rt) : GetRectTop(rt);
+            startValue = hl ? rt.GetAnchoredLeft() : rt.GetAnchoredTop();
             startValue += offset;
         }
         else
@@ -167,13 +167,13 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         {
             border = view.rect.width;
             value = position.x + content.rect.xMin;
-            value += GetRectLeft(content.GetChild(count - 1) as RectTransform);
+            value += ((RectTransform)content.GetChild(count - 1)).GetAnchoredLeft();
         }
         else
         {
             border = -view.rect.height;
             value = position.y + content.rect.yMax;
-            value += GetRectTop(content.GetChild(count - 1) as RectTransform);
+            value += ((RectTransform)content.GetChild(count - 1)).GetAnchoredTop();
         }
 
         for (int i = count - 1; i >= 0; i--)
@@ -213,7 +213,7 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         if (count > 0)
         {
             var rt = content.GetChild(0) as RectTransform;
-            startValue = hl ? GetRectRight(rt) : GetRectBottom(rt);
+            startValue = hl ? rt.GetAnchoredRight() : rt.GetAnchoredBottom();
             startValue -= offset;
         }
         else

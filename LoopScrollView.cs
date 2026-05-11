@@ -651,30 +651,6 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         return offset;
     }
 
-    protected static float GetRectBottom(RectTransform rt)
-    {
-        var pos = rt.anchoredPosition.y;
-        return pos + rt.rect.yMin;
-    }
-
-    protected static float GetRectTop(RectTransform rt)
-    {
-        var pos = rt.anchoredPosition.y;
-        return pos + rt.rect.yMax;
-    }
-
-    protected static float GetRectLeft(RectTransform rt)
-    {
-        var pos = rt.anchoredPosition.x;
-        return pos + rt.rect.xMin;
-    }
-
-    protected static float GetRectRight(RectTransform rt)
-    {
-        var pos = rt.anchoredPosition.x;
-        return pos + rt.rect.xMax;
-    }
-
     protected bool IsItemVisible(int index)
     {
         return index >= startIndex && index <= endIndex;
