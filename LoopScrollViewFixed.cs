@@ -1,98 +1,13 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 using static UnityEngine.UI.ScrollRect;
 
-public class LoopScrollViewFixed : LoopScrollView
+public class LoopScrollViewFixed : LoopScrollViewOneDirection
 {
-    public RectTransform.Axis direction;
     public float size;
     public float spacing;
 
-    [SerializeField]
-    private Scrollbar m_Scrollbar;
-
-    public Scrollbar scrollbar
-    {
-        get
-        {
-            return m_Scrollbar;
-        }
-        set
-        {
-            if (m_Scrollbar)
-                m_Scrollbar.onValueChanged.RemoveListener(SetNormalizedPosition);
-            m_Scrollbar = value;
-            if (m_Scrollbar)
-                m_Scrollbar.onValueChanged.AddListener(SetNormalizedPosition);
-        }
-    }
-
-    public override Scrollbar horizontalScrollbar
-    {
-        get
-        {
-            if (vertical) return null;
-            return m_Scrollbar;
-        }
-        set
-        {
-            if (vertical) return;
-            scrollbar = value;
-        }
-    }
-
-    public override Scrollbar verticalScrollbar
-    {
-        get
-        {
-            if (horizontal) return null;
-            return m_Scrollbar;
-        }
-        set
-        {
-            if (horizontal) return;
-            scrollbar = value;
-        }
-    }
-
-    [SerializeField]
-    private ScrollbarVisibility m_ScrollbarVisibility;
-    public ScrollbarVisibility scrollbarVisibility
-    {
-        get => m_ScrollbarVisibility;
-        set => m_ScrollbarVisibility = value;
-    }
-
-    public override ScrollbarVisibility horizontalScrollbarVisibility
-    {
-        get
-        {
-            if (vertical) return ScrollbarVisibility.Permanent;
-            return scrollbarVisibility;
-        }
-        set
-        {
-            if (vertical) return;
-            scrollbarVisibility = value;
-        }
-    }
-
-    public override ScrollbarVisibility verticalScrollbarVisibility
-    {
-        get
-        {
-            if (horizontal) return ScrollbarVisibility.Permanent;
-            return scrollbarVisibility;
-        }
-        set
-        {
-            if (horizontal) return;
-            scrollbarVisibility = value;
-        }
-    }
-
-    private float normalizedValue
+    protected override float normalizedValue
     {
         get
         {
@@ -120,24 +35,6 @@ public class LoopScrollViewFixed : LoopScrollView
             }
         }
     }
-
-    public override Vector2 normalizedPosition
-    {
-        get
-        {
-            if (horizontal) return new Vector2(normalizedValue, 0);
-            else return new Vector2(0, normalizedValue);
-        }
-        set
-        {
-            if (horizontal) SetNormalizedPosition(value.x);
-            else SetNormalizedPosition(value.y);
-        }
-    }
-
-    protected override bool vertical => direction == RectTransform.Axis.Vertical;
-
-    protected override bool horizontal => direction == RectTransform.Axis.Horizontal;
 
     private float totalSize, itemOffset;
 
@@ -411,37 +308,6 @@ public class LoopScrollViewFixed : LoopScrollView
         UpdateContentBounds();
     }
 
-    private void RepositionContent(in Vector2 position)
-    {
-        Vector2 offset = Vector2.zero;
-        if (horizontal)
-        {
-            if (Math.Abs(position.x) <= view.rect.width)
-            {
-                content.anchoredPosition = position;
-                return;
-            }
-            offset.x = position.x;
-        }
-        else
-        {
-            if (Math.Abs(position.y) <= view.rect.height)
-            {
-                content.anchoredPosition = position;
-                return;
-            }
-            offset.y = position.y;
-        }
-        content.anchoredPosition = position - offset;
-        foreach (var item in content)
-        {
-            (item as RectTransform).anchoredPosition += offset;
-        }
-        m_ContentStartPosition -= offset;
-        m_VirtualContentOffset += offset;
-        //totalContentOffset精度怕有问题的话，这里应该可以根据子节点重新算一个
-    }
-
     protected override void UpdateContentBounds()
     {
         if (movementType == MovementType.Unrestricted || totalCount < 0) return;
@@ -477,7 +343,7 @@ public class LoopScrollViewFixed : LoopScrollView
         AdjustBounds();
     }
 
-    private void SetNormalizedPosition(float value)
+    protected override void SetNormalizedPosition(float value)
     {
         if (normalizedValue == value) return;
         var axis = horizontal ? 0 : 1;
@@ -517,12 +383,4 @@ public class LoopScrollViewFixed : LoopScrollView
         }
         m_Scrollbar.value = normalizedValue;
     }
-
-    protected override void OnDisable()
-    {
-        if (scrollbar)
-            scrollbar.onValueChanged.RemoveListener(SetNormalizedPosition);
-        base.OnDisable();
-    }
-
 }
