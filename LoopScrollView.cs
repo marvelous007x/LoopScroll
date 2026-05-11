@@ -693,7 +693,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         }
         if (vertical)
         {
-            if (pos.y + rect.xMin > 0 || pos.y + rect.yMin < -view.rect.height)
+            if (pos.y + rect.yMax > 0 || pos.y + rect.yMin < -view.rect.height)
                 return false;
         }
         return true;
