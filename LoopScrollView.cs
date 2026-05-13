@@ -116,7 +116,8 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         m_VirtualContentOffset.y = 0;
         Refill();
         UpdateBounds();
-        if (totalCount > 0 && endIndex >= totalCount - 1)
+        // 处理有offset时，已经到最后一个元素就尝试向前塞元素
+        if (totalCount > 0 && endIndex >= totalCount - 1 && offset > 0 && movementType != MovementType.Unrestricted)
         {
             var positionOffset = Vector2.zero;
             if (horizontal)
