@@ -57,12 +57,12 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         if (hl)
         {
             value = position.x + content.rect.xMin;
-            value += ((RectTransform)content.GetChild(0)).GetAnchoredRight();
+            value += (content.GetChild(0) as RectTransform).GetAnchoredRight();
         }
         else
         {
             value = position.y + content.rect.yMax;
-            value += ((RectTransform)content.GetChild(0)).GetAnchoredBottom();
+            value += (content.GetChild(0) as RectTransform).GetAnchoredBottom();
         }
         for (int i = 0; i < count; i++)
         {
@@ -120,21 +120,8 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         }
 
         float border = hl ? (view.rect.width - anchorValue) : (-view.rect.height - anchorValue);
-        var templateRt = prefabSource.template.transform as RectTransform;
-        var anchorMin = templateRt.anchorMin;
-        var anchorMax = templateRt.anchorMax;
-        var p = templateRt.anchoredPosition;
+        var p = (prefabSource.template.transform as RectTransform).anchoredPosition;
         ref float value = ref (hl ? ref p.x : ref p.y);
-        if (hl)
-        {
-            anchorMin.x = 0;
-            anchorMax.x = 0;
-        }
-        else
-        {
-            anchorMin.y = 1;
-            anchorMax.y = 1;
-        }
 
         while (true)
         {
@@ -145,8 +132,6 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
             if (!hl && startValue <= border)
                 break;
             var item = InstantiateItem();
-            item.anchorMin = anchorMin;
-            item.anchorMax = anchorMax;
             value = startValue + (hl ? item.pivot.x : (item.pivot.y - 1)) * size;
             item.anchoredPosition = p;
             endIndex++;
@@ -167,13 +152,13 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         {
             border = view.rect.width;
             value = position.x + content.rect.xMin;
-            value += ((RectTransform)content.GetChild(count - 1)).GetAnchoredLeft();
+            value += (content.GetChild(count - 1) as RectTransform).GetAnchoredLeft();
         }
         else
         {
             border = -view.rect.height;
             value = position.y + content.rect.yMax;
-            value += ((RectTransform)content.GetChild(count - 1)).GetAnchoredTop();
+            value += (content.GetChild(count - 1) as RectTransform).GetAnchoredTop();
         }
 
         for (int i = count - 1; i >= 0; i--)
@@ -232,23 +217,9 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
             startValue -= offset;
         }
         float border = -anchorValue;
-        var templateRt = prefabSource.template.transform as RectTransform;
-        var anchorMin = templateRt.anchorMin;
-        var anchorMax = templateRt.anchorMax;
-        var p = templateRt.anchoredPosition;
+        var p = (prefabSource.template.transform as RectTransform).anchoredPosition;
 
         ref float value = ref (hl ? ref p.x : ref p.y);
-        if (hl)
-        {
-            anchorMin.x = 0;
-            anchorMax.x = 0;
-        }
-        else
-        {
-            anchorMin.y = 1;
-            anchorMax.y = 1;
-        }
-
         while (true)
         {
             if (totalCount > 0 && startIndex <= 0) break;
@@ -256,8 +227,6 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
             if (!hl && startValue >= border) break;
             var item = InstantiateItem();
             item.SetAsFirstSibling();
-            item.anchorMin = anchorMin;
-            item.anchorMax = anchorMax;
             value = startValue + (hl ? (item.pivot.x - 1) : item.pivot.y) * size;
 
             item.anchoredPosition = p;

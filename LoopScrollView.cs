@@ -71,9 +71,9 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
 
     public Action<int, RectTransform> onRefreshItem;
     public Action<int, RectTransform> onReleaseItem;
-
     protected Vector2 m_VirtualContentOffset;
     protected int startIndex = 0, endIndex = -1;
+    private Vector2 itemAnchorMin, itemAnchorMax;
     protected bool filled;
 
     public void RefillCells(int offset = 0)
@@ -86,11 +86,16 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         var anchorMin = content.anchorMin;
         var anchorMax = content.anchorMax;
         var pivot = content.pivot;
+        var item = prefabSource.template.transform as RectTransform;
+        itemAnchorMin = item.anchorMin;
+        itemAnchorMax = item.anchorMax;
         if (horizontal)
         {
             anchorMin.x = 0;
             anchorMax.x = 0;
             pivot.x = 0;
+            itemAnchorMin.x = 0;
+            itemAnchorMax.x = 0;
             pos.x = 0;
         }
         if (vertical)
@@ -98,11 +103,14 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
             anchorMin.y = 1;
             anchorMax.y = 1;
             pivot.y = 1;
+            itemAnchorMin.y = 1;
+            itemAnchorMax.y = 1;
             pos.y = 0;
         }
         content.anchorMin = anchorMin;
         content.anchorMax = anchorMax;
         content.pivot = pivot;
+
         content.anchoredPosition = pos;
         m_VirtualContentOffset.x = 0;
         m_VirtualContentOffset.y = 0;
@@ -288,6 +296,8 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
     {
         RectTransform item = prefabSource.Get().transform as RectTransform;
         item.transform.SetParent(content, false);
+        item.anchorMin = itemAnchorMin;
+        item.anchorMax = itemAnchorMax;
         return item;
     }
 
