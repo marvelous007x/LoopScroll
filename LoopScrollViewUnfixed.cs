@@ -103,9 +103,7 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
                 break;
             if (vertical && itemStartPosition <= border)
                 break;
-            var item = InstantiateItem();
-            endIndex++;
-            item.name = endIndex.ToString();
+            var item = InstantiateItem(++endIndex); ;
             onRefreshItem?.Invoke(endIndex, item);
             var pivot = item.pivot;
             var size = hl ? item.rect.width : item.rect.height;
@@ -190,10 +188,8 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
             var itemEndPosition = startPosition + spacingOffset;
             if (hl && itemEndPosition <= border) break;
             if (vertical && itemEndPosition >= border) break;
-            var item = InstantiateItem();
+            var item = InstantiateItem(--startIndex);
             item.SetAsFirstSibling();
-            startIndex--;
-            item.name = startIndex.ToString();
             onRefreshItem?.Invoke(startIndex, item);
             var size = hl ? item.rect.width : item.rect.height;
             if (hl)

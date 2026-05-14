@@ -294,12 +294,13 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         m_Velocity = Vector2.zero;
     }
 
-    protected RectTransform InstantiateItem()
+    protected RectTransform InstantiateItem(int index)
     {
         RectTransform item = prefabSource.Get().transform as RectTransform;
         item.transform.SetParent(content, false);
         item.anchorMin = itemAnchorMin;
         item.anchorMax = itemAnchorMax;
+        item.name = index.ToString();
         return item;
     }
 

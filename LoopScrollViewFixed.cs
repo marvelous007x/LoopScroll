@@ -131,11 +131,9 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
                 break;
             if (!hl && startValue <= border)
                 break;
-            var item = InstantiateItem();
+            var item = InstantiateItem(++endIndex);
             value = startValue + (hl ? item.pivot.x : (item.pivot.y - 1)) * size;
             item.anchoredPosition = p;
-            endIndex++;
-            item.name = endIndex.ToString();//zzz
             onRefreshItem?.Invoke(endIndex, item);
             startValue += offset;
         }
@@ -225,13 +223,10 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
             if (totalCount > 0 && startIndex <= 0) break;
             if (hl && startValue <= border) break;
             if (!hl && startValue >= border) break;
-            var item = InstantiateItem();
+            var item = InstantiateItem(--startIndex);
             item.SetAsFirstSibling();
             value = startValue + (hl ? (item.pivot.x - 1) : item.pivot.y) * size;
-
             item.anchoredPosition = p;
-            startIndex--;
-            item.name = startIndex.ToString();//zzz
             onRefreshItem?.Invoke(startIndex, item);
             startValue -= offset;
         }
