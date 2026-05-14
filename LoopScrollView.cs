@@ -82,6 +82,39 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         Clear();
         startIndex = offset;
         endIndex = offset - 1;
+        Setup();
+        UpdateViewBounds();
+        Refill();
+        UpdateContentBounds();
+        // 处理有offset时，已经到最后一个元素就尝试向前塞元素
+        if (totalCount > 0 && endIndex >= totalCount - 1 && offset > 0 && movementType != MovementType.Unrestricted)
+        {
+            var positionOffset = Vector2.zero;
+            if (horizontal)
+                positionOffset.x = m_ViewBounds.max.x - m_ContentBounds.max.x;
+            if (vertical)
+                positionOffset.y = m_ViewBounds.min.y - m_ContentBounds.min.y;
+
+            if (positionOffset.x != 0 || positionOffset.y != 0)
+                SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
+        }
+        filled = true;
+        UpdatePrevData();
+        UpdateScrollbars(Vector2.zero);
+    }
+
+    public void RefreshCells()
+    {
+        if (!isActiveAndEnabled) return;
+        int index = 0;
+        for (int i = startIndex; i <= endIndex; i++)
+        {
+            onRefreshItem?.Invoke(startIndex + index, content.GetChild(index++) as RectTransform);
+        }
+    }
+
+    private void Setup()
+    {
         var pos = content.anchoredPosition;
         var anchorMin = content.anchorMin;
         var anchorMax = content.anchorMax;
@@ -114,35 +147,10 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         content.anchoredPosition = pos;
         m_VirtualContentOffset.x = 0;
         m_VirtualContentOffset.y = 0;
-        UpdateViewBounds();
-        Refill();
-        UpdateContentBounds();
-        // 处理有offset时，已经到最后一个元素就尝试向前塞元素
-        if (totalCount > 0 && endIndex >= totalCount - 1 && offset > 0 && movementType != MovementType.Unrestricted)
-        {
-            var positionOffset = Vector2.zero;
-            if (horizontal)
-                positionOffset.x = m_ViewBounds.max.x - m_ContentBounds.max.x;
-            if (vertical)
-                positionOffset.y = m_ViewBounds.min.y - m_ContentBounds.min.y;
-
-            if (positionOffset.x != 0 || positionOffset.y != 0)
-                SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
-        }
-        filled = true;
-        UpdatePrevData();
-        UpdateScrollbars(Vector2.zero);
+        OnSetup();
     }
 
-    public void RefreshCells()
-    {
-        if (!isActiveAndEnabled) return;
-        int index = 0;
-        for (int i = startIndex; i <= endIndex; i++)
-        {
-            onRefreshItem?.Invoke(startIndex + index, content.GetChild(index++) as RectTransform);
-        }
-    }
+    protected virtual void OnSetup() { }
 
     protected abstract void Refill();
 

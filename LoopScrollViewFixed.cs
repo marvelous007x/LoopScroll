@@ -35,240 +35,105 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
         }
     }
 
-    private float totalSize, itemOffset;
+    private float totalSize;
 
-    protected override void Refill()
+    protected override void OnSetup()
     {
-        itemOffset = size + spacing;
-        totalSize = itemOffset * totalCount - spacing;
-        if (horizontal) m_VirtualContentOffset.x = -itemOffset * startIndex;
-        else m_VirtualContentOffset.y = itemOffset * startIndex;
-        InstantiateForwards();
-        UpdateContentBounds();
-        UpdatePrevData();
+        base.OnSetup();
+        var offset = size + spacing;
+        totalSize = offset * totalCount - spacing;
+        if (horizontal) m_VirtualContentOffset.x = -offset * startIndex;
+        else m_VirtualContentOffset.y = offset * startIndex;
     }
 
-    protected override void ReleaseForwards(in Vector2 position)
+    protected override void OnInstantiateForwardsJump()
     {
-        var count = content.childCount;
-        if (count == 0) return;
         bool hl = horizontal;
-        float value;
+        float offsetSize = size + spacing;
+        var offset = hl ? offsetSize : -offsetSize;
+
+        float virtualPosition, virtualOffset;
         if (hl)
         {
-            value = position.x + content.rect.xMin;
-            value += (content.GetChild(0) as RectTransform).GetAnchoredRight();
+            virtualOffset = m_VirtualContentOffset.x;
+            virtualPosition = content.anchoredPosition.x + virtualOffset;
         }
         else
         {
-            value = position.y + content.rect.yMax;
-            value += (content.GetChild(0) as RectTransform).GetAnchoredBottom();
+            virtualOffset = m_VirtualContentOffset.y;
+            virtualPosition = content.anchoredPosition.y + virtualOffset;
         }
-        for (int i = 0; i < count; i++)
-        {
-            var item = content.GetChild(0) as RectTransform;
-            if (hl)
-            {
-                if (value <= 0)
-                {
-                    ReleaseItem(startIndex++, item);
-                    value += itemOffset;
-                    continue;
-                }
-            }
-            else
-            {
-                if (value >= 0)
-                {
-                    ReleaseItem(startIndex++, item);
-                    value -= itemOffset;
-                    continue;
-                }
-            }
-            break;
-        }
+
+        startIndex = Mathf.FloorToInt(Math.Abs(virtualPosition) / offsetSize) - 1;
+        endIndex = startIndex - 1;
+        startPosition = startIndex * offset + offset - virtualOffset;
+        endPosition = startPosition + (hl ? -spacing : spacing);
     }
 
-    protected override void InstantiateForwards(bool jump = false)
+    protected override void OnInstantiateBackwardsJump()
     {
-        if (totalCount == 0) return;
         bool hl = horizontal;
-        var count = content.childCount;
-        float startValue = 0;
-        float offset = itemOffset;
-        var anchorValue = hl ? content.anchoredPosition.x : content.anchoredPosition.y;
-        if (!hl) offset = -offset;
-        if (count > 0)
-        {
-            var rt = content.GetChild(count - 1) as RectTransform;
-            startValue = hl ? rt.GetAnchoredLeft() : rt.GetAnchoredTop();
-            startValue += offset;
-        }
-        else
-        {
-            startValue = offset * endIndex;
-            startValue += hl ? m_VirtualContentOffset.x : m_VirtualContentOffset.y;
-            if (jump)
-            {
-                var startBorder = (horizontal ? -size : size) + anchorValue;
-                var add = Mathf.FloorToInt(Math.Abs(startBorder - startValue) / itemOffset);
-                startIndex += add;
-                endIndex += add;
-                startValue += add * offset;
-            }
-            startValue += offset;
-        }
+        float offsetSize = size + spacing;
+        var offset = hl ? offsetSize : -offsetSize;
 
-        float border = hl ? (view.rect.width - anchorValue) : (-view.rect.height - anchorValue);
-        var p = (prefabSource.template.transform as RectTransform).anchoredPosition;
-        ref float value = ref (hl ? ref p.x : ref p.y);
-
-        while (true)
-        {
-            if (totalCount > 0 && endIndex >= totalCount - 1)
-                break;
-            if (hl && startValue >= border)
-                break;
-            if (!hl && startValue <= border)
-                break;
-            var item = InstantiateItem(++endIndex);
-            value = startValue + (hl ? item.pivot.x : (item.pivot.y - 1)) * size;
-            item.anchoredPosition = p;
-            onRefreshItem?.Invoke(endIndex, item);
-            startValue += offset;
-        }
-    }
-
-    protected override void ReleaseBackwards(in Vector2 position)
-    {
-        var count = content.childCount;
-        if (count == 0) return;
-
-        bool hl = horizontal;
-        float value, border;
+        float virtualPosition, virtualOffset;
         if (hl)
         {
-            border = view.rect.width;
-            value = position.x + content.rect.xMin;
-            value += (content.GetChild(count - 1) as RectTransform).GetAnchoredLeft();
+            virtualOffset = m_VirtualContentOffset.x;
+            virtualPosition = content.anchoredPosition.x + virtualOffset + view.rect.width;
         }
         else
         {
-            border = -view.rect.height;
-            value = position.y + content.rect.yMax;
-            value += (content.GetChild(count - 1) as RectTransform).GetAnchoredTop();
+            virtualOffset = m_VirtualContentOffset.y;
+            virtualPosition = content.anchoredPosition.y + virtualOffset - view.rect.height;
         }
 
-        for (int i = count - 1; i >= 0; i--)
-        {
-            var item = content.GetChild(i) as RectTransform;
-            if (hl)
-            {
-                if (value >= border)
-                {
-                    ReleaseItem(endIndex--, item);
-                    value -= itemOffset;
-                    continue;
-                }
-            }
-            else
-            {
-                if (value <= border)
-                {
-                    ReleaseItem(endIndex--, item);
-                    value += itemOffset;
-                    continue;
-                }
-            }
-            break;
-        }
-    }
-
-    protected override void InstantiateBackwards(bool jump = false)
-    {
-        if (totalCount == 0) return;
-        bool hl = horizontal;
-        var count = content.childCount;
-        var anchorValue = hl ? content.anchoredPosition.x : content.anchoredPosition.y;
-        float startValue;
-        float offset = itemOffset;
-        if (!hl) offset = -offset;
-        if (count > 0)
-        {
-            var rt = content.GetChild(0) as RectTransform;
-            startValue = hl ? rt.GetAnchoredRight() : rt.GetAnchoredBottom();
-            startValue -= offset;
-        }
-        else
-        {
-            startValue = offset * startIndex + (hl ? size : -size);
-            startValue += hl ? m_VirtualContentOffset.x : m_VirtualContentOffset.y;
-
-            if (jump)
-            {
-                var startBorder = (horizontal ? view.rect.width + size : -view.rect.height - size) - anchorValue;
-                var add = Mathf.FloorToInt(Math.Abs(startBorder - startValue) / itemOffset);
-                startIndex -= add;
-                endIndex -= add;
-                startValue -= add * offset;
-            }
-            startValue -= offset;
-        }
-        float border = -anchorValue;
-        var p = (prefabSource.template.transform as RectTransform).anchoredPosition;
-
-        ref float value = ref (hl ? ref p.x : ref p.y);
-        while (true)
-        {
-            if (totalCount > 0 && startIndex <= 0) break;
-            if (hl && startValue <= border) break;
-            if (!hl && startValue >= border) break;
-            var item = InstantiateItem(--startIndex);
-            item.SetAsFirstSibling();
-            value = startValue + (hl ? (item.pivot.x - 1) : item.pivot.y) * size;
-            item.anchoredPosition = p;
-            onRefreshItem?.Invoke(startIndex, item);
-            startValue -= offset;
-        }
+        startIndex = Mathf.CeilToInt(Math.Abs(virtualPosition) / offsetSize);
+        endIndex = startIndex - 1;
+        startPosition = startIndex * offset - virtualOffset;
+        endPosition = startPosition + (hl ? size : -size);
     }
 
     protected override void UpdateContentBounds()
     {
         if (movementType == MovementType.Unrestricted || totalCount < 0) return;
         m_ContentBounds.center = m_ViewBounds.center;
-        m_ContentBounds.extents = m_ViewBounds.extents * 2;
+        var viewExtents = m_ViewBounds.extents;
+        m_ContentBounds.extents = viewExtents * 2;
         if (startIndex <= 0 || endIndex >= totalCount - 1)
         {
             if (horizontal)
             {
+                var virtualPosition = content.anchoredPosition.x + m_VirtualContentOffset.x;
                 var max = m_ViewBounds.max;
                 max.y += max.y;
-                max.x = totalSize + m_VirtualContentOffset.x + content.anchoredPosition.x - max.x;
+                max.x = virtualPosition + totalSize - viewExtents.x;
                 m_ContentBounds.max = max;
 
                 var min = m_ViewBounds.min;
                 min.y += min.y;
-                min.x += content.anchoredPosition.x + m_VirtualContentOffset.x;
+                min.x = virtualPosition - viewExtents.x;
                 m_ContentBounds.min = min;
             }
             else
             {
+                var virtualPosition = content.anchoredPosition.y + m_VirtualContentOffset.y;
                 var min = m_ViewBounds.min;
                 min.x += min.x;
-                min.y = -totalSize + m_VirtualContentOffset.y + content.anchoredPosition.y - min.y;
+                min.y = virtualPosition - totalSize + viewExtents.y;
                 m_ContentBounds.min = min;
 
                 var max = m_ViewBounds.max;
                 max.x += max.x;
-                max.y += content.anchoredPosition.y + m_VirtualContentOffset.y;
+                max.y = virtualPosition + viewExtents.y;
                 m_ContentBounds.max = max;
             }
         }
         AdjustBounds();
     }
-
     protected override void SetNormalizedPosition(float value)
     {
+        Debug.Log(value);
         if (normalizedValue == value) return;
         var axis = horizontal ? 0 : 1;
         if (horizontal) value = -value;
@@ -306,5 +171,10 @@ public class LoopScrollViewFixed : LoopScrollViewOneDirection
             }
         }
         m_Scrollbar.value = normalizedValue;
+    }
+
+    protected override float GetItemSize(RectTransform item, int index)
+    {
+        return size;
     }
 }

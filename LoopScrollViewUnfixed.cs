@@ -1,11 +1,7 @@
 using UnityEngine;
 using static UnityEngine.UI.ScrollRect;
-
 public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
 {
-    private float startPosition, endPosition;
-    private float boundStart, boundEnd;
-    private bool everReachStart, everReachEnd;
 
     protected override float normalizedValue
     {
@@ -37,188 +33,19 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
         // }
     }
 
-    protected override void Refill()
+    protected override void OnSetup()
     {
+        base.OnSetup();
         m_Scrollbar = null;     //拖动条的位置相关处理没想好，暂时放一边
-        startPosition = 0;
-        everReachStart = everReachEnd = false;
-        endPosition = horizontal ? -spacing : spacing;
-        InstantiateForwards();
-        UpdateContentBounds();
-        UpdatePrevData();
     }
 
-    protected override void ReleaseForwards(in Vector2 position)
+    protected override void OnInstantiateForwardsJump()
     {
-        var count = content.childCount;
-        if (count == 0) return;
-        bool hl = horizontal;
-        var border = hl ? -content.anchoredPosition.x : -content.anchoredPosition.y;
-        float itemEndPosition;
-        for (int i = 0; i < count; i++)
-        {
-            var item = content.GetChild(0) as RectTransform;
-            var size = hl ? item.rect.width : item.rect.height;
-            if (hl)
-            {
-                itemEndPosition = item.anchoredPosition.x + LoopScrollViewHelper.GetAnchoredRightOffset(size, item.pivot.x);
-                if (itemEndPosition <= border)
-                {
-                    ReleaseItem(startIndex++, item);
-                    startPosition = itemEndPosition + spacing;
-                    continue;
-                }
-            }
-            else
-            {
-                itemEndPosition = item.anchoredPosition.y + LoopScrollViewHelper.GetAnchoredBottomOffset(size, item.pivot.y);
-                if (itemEndPosition >= border)
-                {
-                    ReleaseItem(startIndex++, item);
-                    startPosition = itemEndPosition - spacing;
-                    continue;
-                }
-            }
-            break;
-        }
     }
 
-    protected override void InstantiateForwards(bool jump = false)
+    protected override void OnInstantiateBackwardsJump()
     {
-        if (totalCount == 0) return;
-        bool hl = horizontal;
-        var count = content.childCount;
-        var contentPosition = hl ? content.anchoredPosition.x : content.anchoredPosition.y;
 
-        float border = hl ? (view.rect.width - contentPosition) : (-view.rect.height - contentPosition);
-        var p = (prefabSource.template.transform as RectTransform).anchoredPosition;
-        ref float value = ref (hl ? ref p.x : ref p.y);
-        var spacingOffset = hl ? spacing : -spacing;
-        while (true)
-        {
-            if (totalCount > 0 && endIndex >= totalCount - 1)
-                break;
-            var itemStartPosition = endPosition + spacingOffset;
-            if (hl && itemStartPosition >= border)
-                break;
-            if (vertical && itemStartPosition <= border)
-                break;
-            var item = InstantiateItem(++endIndex); ;
-            onRefreshItem?.Invoke(endIndex, item);
-            var pivot = item.pivot;
-            var size = hl ? item.rect.width : item.rect.height;
-            if (hl)
-            {
-                value = itemStartPosition - LoopScrollViewHelper.GetAnchoredLeftOffset(size, pivot.x);
-                endPosition = itemStartPosition + size;
-            }
-            else
-            {
-                value = itemStartPosition - LoopScrollViewHelper.GetAnchoredTopOffset(size, pivot.y);
-                endPosition = itemStartPosition - size;
-            }
-            item.anchoredPosition = p;
-            if (totalCount > 0)
-            {
-                if (endIndex == 0)
-                {
-                    everReachStart = true;
-                    boundStart = itemStartPosition;
-                }
-
-                if (endIndex == totalCount - 1)
-                {
-                    everReachEnd = true;
-                    boundEnd = endPosition;
-                }
-            }
-        }
-    }
-
-    protected override void ReleaseBackwards(in Vector2 position)
-    {
-        var count = content.childCount;
-        if (count == 0) return;
-
-        bool hl = horizontal;
-        var border = hl ? view.rect.width - content.anchoredPosition.x : -view.rect.height - content.anchoredPosition.y;
-
-        float itemStartPosition;
-        for (int i = count - 1; i >= 0; i--)
-        {
-            var item = content.GetChild(i) as RectTransform;
-            var size = hl ? item.rect.width : item.rect.height;
-            if (hl)
-            {
-                itemStartPosition = item.anchoredPosition.x + LoopScrollViewHelper.GetAnchoredLeftOffset(size, item.pivot.x);
-                if (itemStartPosition >= border)
-                {
-                    ReleaseItem(endIndex--, item);
-                    endPosition = itemStartPosition - spacing;
-                    continue;
-                }
-            }
-            else
-            {
-                itemStartPosition = item.anchoredPosition.y + LoopScrollViewHelper.GetAnchoredTopOffset(size, item.pivot.y);
-                if (itemStartPosition <= border)
-                {
-                    ReleaseItem(endIndex--, item);
-                    endPosition = itemStartPosition + spacing;
-                    continue;
-                }
-            }
-            break;
-        }
-    }
-
-    protected override void InstantiateBackwards(bool jump = false)
-    {
-        if (totalCount == 0) return;
-        bool hl = horizontal;
-        var count = content.childCount;
-        var contentPosition = hl ? content.anchoredPosition.x : content.anchoredPosition.y;
-        float border = -contentPosition;
-        var p = (prefabSource.template.transform as RectTransform).anchoredPosition;
-        ref float value = ref (hl ? ref p.x : ref p.y);
-        float spacingOffset = hl ? -spacing : spacing;
-        while (true)
-        {
-            if (totalCount > 0 && startIndex <= 0) break;
-            var itemEndPosition = startPosition + spacingOffset;
-            if (hl && itemEndPosition <= border) break;
-            if (vertical && itemEndPosition >= border) break;
-            var item = InstantiateItem(--startIndex);
-            item.SetAsFirstSibling();
-            onRefreshItem?.Invoke(startIndex, item);
-            var size = hl ? item.rect.width : item.rect.height;
-            if (hl)
-            {
-                value = itemEndPosition - LoopScrollViewHelper.GetAnchoredRightOffset(size, item.pivot.x);
-                startPosition = itemEndPosition - size;
-            }
-            else
-            {
-                value = itemEndPosition - LoopScrollViewHelper.GetAnchoredBottomOffset(size, item.pivot.y);
-                startPosition = itemEndPosition + size;
-            }
-            item.anchoredPosition = p;
-
-            if (totalCount > 0)
-            {
-                if (startIndex == 0)
-                {
-                    everReachStart = true;
-                    boundStart = startPosition;
-                }
-
-                if (startIndex == totalCount - 1)
-                {
-                    everReachEnd = true;
-                    boundEnd = itemEndPosition;
-                }
-            }
-        }
     }
 
     protected override void UpdateContentBounds()
@@ -266,15 +93,6 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
             }
         }
         AdjustBounds();
-    }
-
-    protected override void OnContentRepsoitioned(Vector2 offset)
-    {
-        var add = horizontal ? offset.x : offset.y;
-        startPosition += add;
-        endPosition += add;
-        boundStart += add;
-        boundEnd += add;
     }
 
     protected override void SetNormalizedPosition(float value)
@@ -325,4 +143,8 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
         // m_Scrollbar.value = normalizedValue;
     }
 
+    protected override float GetItemSize(RectTransform item, int index)
+    {
+        return horizontal ? item.rect.width : item.rect.height;
+    }
 }
