@@ -36,7 +36,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
 
     protected abstract bool vertical { get; }
     protected abstract bool horizontal { get; }
-    private bool m_Dragging;
+    protected bool m_Dragging;
     private bool m_Scrolling;
     public abstract Scrollbar horizontalScrollbar { get; set; }
     public abstract Scrollbar verticalScrollbar { get; set; }
@@ -114,8 +114,9 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         content.anchoredPosition = pos;
         m_VirtualContentOffset.x = 0;
         m_VirtualContentOffset.y = 0;
+        UpdateViewBounds();
         Refill();
-        UpdateBounds();
+        UpdateContentBounds();
         // 处理有offset时，已经到最后一个元素就尝试向前塞元素
         if (totalCount > 0 && endIndex >= totalCount - 1 && offset > 0 && movementType != MovementType.Unrestricted)
         {

@@ -2,6 +2,12 @@
 
 internal static class LoopScrollViewHelpers
 {
+    internal static float GetAnchoredTop(this RectTransform rt)
+    {
+        var pos = rt.anchoredPosition.y;
+        return pos + rt.rect.yMax;
+    }
+
     internal static float GetAnchoredBottom(this RectTransform rt)
     {
         var pos = rt.anchoredPosition.y;
@@ -20,12 +26,6 @@ internal static class LoopScrollViewHelpers
         return pos + rt.rect.xMax;
     }
 
-    internal static float GetAnchoredTop(this RectTransform rt)
-    {
-        var pos = rt.anchoredPosition.y;
-        return pos + rt.rect.yMax;
-    }
-
     internal static Vector2 GetAnchoredMax(this RectTransform rt)
     {
         var pos = rt.anchoredPosition;
@@ -36,5 +36,25 @@ internal static class LoopScrollViewHelpers
     {
         var pos = rt.anchoredPosition;
         return pos + rt.rect.min;
+    }
+
+    internal static float GetAnchoredTopOffset(float height, float pivot)
+    {
+        return (1 - pivot) * height;
+    }
+
+    internal static float GetAnchoredBottomOffset(float height, float pivot)
+    {
+        return -pivot * height;
+    }
+
+    internal static float GetAnchoredLeftOffset(float width, float pivot)
+    {
+        return -pivot * width;
+    }
+
+    internal static float GetAnchoredRightOffset(float width, float pivot)
+    {
+        return (1 - pivot) * width;
     }
 }

@@ -173,6 +173,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
         }
         m_ContentStartPosition -= offset;
         m_VirtualContentOffset += offset;
+        OnContentRepsoitioned(offset);
     }
 
     protected abstract void ReleaseForwards(in Vector2 position);
@@ -180,6 +181,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
     protected abstract void ReleaseBackwards(in Vector2 position);
     protected abstract void InstantiateBackwards(bool jump = false);
     protected abstract void SetNormalizedPosition(float value);
+    protected virtual void OnContentRepsoitioned(Vector2 offset) { }
 
     protected override void OnEnable()
     {
