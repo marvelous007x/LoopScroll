@@ -61,7 +61,7 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
             var size = hl ? item.rect.width : item.rect.height;
             if (hl)
             {
-                itemEndPosition = item.anchoredPosition.x + LoopScrollViewHelpers.GetAnchoredRightOffset(size, item.pivot.x);
+                itemEndPosition = item.anchoredPosition.x + LoopScrollViewHelper.GetAnchoredRightOffset(size, item.pivot.x);
                 if (itemEndPosition <= border)
                 {
                     ReleaseItem(startIndex++, item);
@@ -71,7 +71,7 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
             }
             else
             {
-                itemEndPosition = item.anchoredPosition.y + LoopScrollViewHelpers.GetAnchoredBottomOffset(size, item.pivot.y);
+                itemEndPosition = item.anchoredPosition.y + LoopScrollViewHelper.GetAnchoredBottomOffset(size, item.pivot.y);
                 if (itemEndPosition >= border)
                 {
                     ReleaseItem(startIndex++, item);
@@ -111,12 +111,12 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
             var size = hl ? item.rect.width : item.rect.height;
             if (hl)
             {
-                value = itemStartPosition - LoopScrollViewHelpers.GetAnchoredLeftOffset(size, pivot.x);
+                value = itemStartPosition - LoopScrollViewHelper.GetAnchoredLeftOffset(size, pivot.x);
                 endPosition = itemStartPosition + size;
             }
             else
             {
-                value = itemStartPosition - LoopScrollViewHelpers.GetAnchoredTopOffset(size, pivot.y);
+                value = itemStartPosition - LoopScrollViewHelper.GetAnchoredTopOffset(size, pivot.y);
                 endPosition = itemStartPosition - size;
             }
             item.anchoredPosition = p;
@@ -152,7 +152,7 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
             var size = hl ? item.rect.width : item.rect.height;
             if (hl)
             {
-                itemStartPosition = item.anchoredPosition.x + LoopScrollViewHelpers.GetAnchoredLeftOffset(size, item.pivot.x);
+                itemStartPosition = item.anchoredPosition.x + LoopScrollViewHelper.GetAnchoredLeftOffset(size, item.pivot.x);
                 if (itemStartPosition >= border)
                 {
                     ReleaseItem(endIndex--, item);
@@ -162,7 +162,7 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
             }
             else
             {
-                itemStartPosition = item.anchoredPosition.y + LoopScrollViewHelpers.GetAnchoredTopOffset(size, item.pivot.y);
+                itemStartPosition = item.anchoredPosition.y + LoopScrollViewHelper.GetAnchoredTopOffset(size, item.pivot.y);
                 if (itemStartPosition <= border)
                 {
                     ReleaseItem(endIndex--, item);
@@ -198,12 +198,12 @@ public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
             var size = hl ? item.rect.width : item.rect.height;
             if (hl)
             {
-                value = itemEndPosition - LoopScrollViewHelpers.GetAnchoredRightOffset(size, item.pivot.x);
+                value = itemEndPosition - LoopScrollViewHelper.GetAnchoredRightOffset(size, item.pivot.x);
                 startPosition = itemEndPosition - size;
             }
             else
             {
-                value = itemEndPosition - LoopScrollViewHelpers.GetAnchoredBottomOffset(size, item.pivot.y);
+                value = itemEndPosition - LoopScrollViewHelper.GetAnchoredBottomOffset(size, item.pivot.y);
                 startPosition = itemEndPosition + size;
             }
             item.anchoredPosition = p;

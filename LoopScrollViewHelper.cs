@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-internal static class LoopScrollViewHelpers
+internal static class LoopScrollViewHelper
 {
     internal static float GetAnchoredTop(this RectTransform rt)
     {
