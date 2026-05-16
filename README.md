@@ -8,9 +8,23 @@ I have implemented for Horizontal/Vertical loop with one element each row/column
 
 If element size is fixed, use `LoopScrollFixed`, you should set its size field, since it will ignore item's real size. Otherwise use `LoopScrollFlex`.
 
-Set `totalCount` negative for infinite items.
+## Use
 
-## Some Notes
+- Listen to `onRefreshItem` to draw your elements.
+
+- Listen to `onReleaseItem` if you wish to get callback when element was released to cache pool.
+
+- Set `totalCount` negative for infinite items.
+
+- Set element size in `onRefreshItem` for dynamic case.
+
+## Dynamic Case Notes
+
+- Scrollbar may be a little jittering, since I need to update predicted total size for all elements and scrollbar value every time when element changes. 
+
+- If you want element for auto size, functionally like `ContentSizeFitter` 、 `LayoutElment`, please implement your own script to immediately resize RectTransform size in `onRefreshItem` invokes. Maybe like `LayoutRebuilder.ForceRebuildLayoutImmediate`.
+
+## Other Notes
 
 - Now it's simple and may lack lots of functions, but should be useable.
 
