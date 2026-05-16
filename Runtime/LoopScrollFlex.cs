@@ -192,7 +192,10 @@ public class LoopScrollFlex : LoopScrollHorizontalOrVertical
         index %= sizes.Length;
         var pValue = sizes[index];
         if (pValue != size)
+        {
             sizes[index] = size;
+            average += (size - pValue)/sizes.Length;
+        }
     }
 
     protected void UpdateContentSize()
