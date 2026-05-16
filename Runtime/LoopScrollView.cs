@@ -10,7 +10,7 @@ using System.Collections;
 public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IScrollHandler
 {
     [Tooltip("Prefab Source")]
-    public LoopSource prefabSource;
+    public LoopItemSource prefabSource;
     [Tooltip("Total count, negative means INFINITE mode")]
     public int totalCount;
     public RectTransform view;
@@ -34,8 +34,8 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
     protected Vector2 m_Velocity;
     public Vector2 velocity { get { return m_Velocity; } set { m_Velocity = value; } }
 
-    protected abstract bool vertical { get; }
-    protected abstract bool horizontal { get; }
+    public abstract bool vertical { get; }
+    public abstract bool horizontal { get; }
     protected bool m_Dragging;
     private bool m_Scrolling;
     public abstract Scrollbar horizontalScrollbar { get; set; }
@@ -69,12 +69,12 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
     public Action onDrag;
     public Action<Vector2> onEndDrag;
 
-    public Action<int, RectTransform> onRefreshItem;
-    public Action<int, RectTransform> onReleaseItem;
+    public Action<RectTransform, int> onRefreshItem;
+    public Action<RectTransform, int> onReleaseItem;
     protected Vector2 m_VirtualContentOffset;
     protected int startIndex = 0, endIndex = -1;
     private Vector2 itemAnchorMin, itemAnchorMax;
-    protected bool filled;
+    protected bool working;
 
     public void RefillCells(int offset = 0)
     {
@@ -82,10 +82,10 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         Clear();
         startIndex = offset;
         endIndex = offset - 1;
+        working = true;
         Setup();
         UpdateViewBounds();
         Refill();
-        UpdateContentBounds();
         // 处理有offset时，已经到最后一个元素就尝试向前塞元素
         if (totalCount > 0 && endIndex >= totalCount - 1 && offset > 0 && movementType != MovementType.Unrestricted)
         {
@@ -98,8 +98,6 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
             if (positionOffset.x != 0 || positionOffset.y != 0)
                 SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
         }
-        filled = true;
-        UpdatePrevData();
         UpdateScrollbars(Vector2.zero);
     }
 
@@ -109,12 +107,13 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         int index = 0;
         for (int i = startIndex; i <= endIndex; i++)
         {
-            onRefreshItem?.Invoke(startIndex + index, content.GetChild(index++) as RectTransform);
+            onRefreshItem?.Invoke(content.GetChild(index++) as RectTransform, startIndex + index);
         }
     }
 
     private void Setup()
     {
+        StopMovement();
         var pos = content.anchoredPosition;
         var anchorMin = content.anchorMin;
         var anchorMax = content.anchorMax;
@@ -148,6 +147,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         m_VirtualContentOffset.x = 0;
         m_VirtualContentOffset.y = 0;
         OnSetup();
+        UpdatePrevData();
     }
 
     protected virtual void OnSetup() { }
@@ -156,7 +156,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
 
     public void ScrollToCell(int index, float speed, Action callBack = null)
     {
-        if (!filled) return;
+        if (!working) return;
         if (totalCount >= 0 && (index < 0 || index >= totalCount))
         {
             Debug.LogWarningFormat("invalid index {0}", index);
@@ -167,7 +167,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
             Debug.LogWarningFormat("invalid speed {0}", speed);
             return;
         }
-        StopAllCoroutines();
+        StopMovement();
         StartCoroutine(ScrollToStartCellCoroutine(index, speed, callBack));
     }
 
@@ -292,13 +292,14 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
                 if (move.x == 0 && move.y == 0) break;
             }
         }
-        StopMovement();
+        m_Velocity = Vector2.zero;
         UpdatePrevData();
         callBack?.Invoke();
     }
 
-    private void StopMovement()
+    public void StopMovement()
     {
+        StopAllCoroutines();
         m_Velocity = Vector2.zero;
     }
 
@@ -312,10 +313,10 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         return item;
     }
 
-    protected void ReleaseItem(int itemIndex, RectTransform item)
+    protected void ReleaseItem(RectTransform item, int index)
     {
         prefabSource.Release(item.gameObject);
-        onReleaseItem?.Invoke(itemIndex, item);
+        onReleaseItem?.Invoke(item, index);
     }
 
     public RectTransform GetItem(int index)
@@ -341,7 +342,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
 
-        if (!IsActive() || !filled)
+        if (!IsActive() || !working)
             return;
 
         if (enableDragInParent)
@@ -382,7 +383,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
             return;
         }
 
-        if (!m_Dragging || !IsActive() || !filled)
+        if (!m_Dragging || !IsActive() || !working)
             return;
 
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(view, eventData.position, eventData.pressEventCamera, out Vector2 localCursor))
@@ -410,7 +411,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
 
-        if (!IsActive() || !filled)
+        if (!IsActive() || !working)
             return;
 
         if (routeToParent)
@@ -426,7 +427,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
 
     public void OnScroll(PointerEventData data)
     {
-        if (!IsActive() || !filled)
+        if (!IsActive() || !working)
             return;
 
         Vector2 delta = data.scrollDelta;
@@ -467,6 +468,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
     protected override void OnEnable()
     {
         base.OnEnable();
+        UpdateScrollbars(Vector2.zero);
         UpdateScrollbarVisibility();
     }
 
@@ -533,7 +535,7 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
         if (virtualPosition != m_PrevPosition)
         {
             UpdateScrollbars(offset);
-            UISystemProfilerApi.AddMarker("ScrollRect.value", this);
+            UISystemProfilerApi.AddMarker("LoopScrollView.value", this);
             onValueChanged?.Invoke(normalizedPosition);
             m_PrevPosition = virtualPosition;
         }
@@ -544,10 +546,10 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
 
     public void Clear()
     {
-        filled = false;
+        working = false;
         for (int i = startIndex; i <= endIndex; i++)
         {
-            ReleaseItem(i, content.GetChild(0) as RectTransform);
+            ReleaseItem(content.GetChild(0) as RectTransform, i);
         }
     }
 
@@ -675,25 +677,6 @@ public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHand
     protected bool IsItemVisible(int index)
     {
         return index >= startIndex && index <= endIndex;
-    }
-
-    protected bool IsItemAllVisible(int index)
-    {
-        if (!IsItemVisible(index)) return false;
-        var item = GetItem(index);
-        var pos = item.anchoredPosition + content.anchoredPosition;
-        var rect = item.rect;
-        if (horizontal)
-        {
-            if (pos.x + rect.xMin < 0 || pos.x + rect.xMax > view.rect.width)
-                return false;
-        }
-        if (vertical)
-        {
-            if (pos.y + rect.yMax > 0 || pos.y + rect.yMin < -view.rect.height)
-                return false;
-        }
-        return true;
     }
 
     protected override void OnDisable()

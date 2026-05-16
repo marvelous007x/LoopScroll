@@ -7,8 +7,8 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
 {
     public RectTransform.Axis direction;
 
-    protected override bool vertical => direction == RectTransform.Axis.Vertical;
-    protected override bool horizontal => direction == RectTransform.Axis.Horizontal;
+    public override bool vertical => direction == RectTransform.Axis.Vertical;
+    public override bool horizontal => direction == RectTransform.Axis.Horizontal;
 
     [SerializeField]
     protected Scrollbar m_Scrollbar;
@@ -94,6 +94,8 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
         }
     }
 
+    protected abstract float expectTotalSize { get; set; }
+
     protected abstract float normalizedValue
     {
         get;
@@ -119,16 +121,9 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
 
     protected override void OnSetup()
     {
-        startPosition = 0;
         everReachStart = everReachEnd = false;
+        startPosition = 0;
         endPosition = horizontal ? -spacing : spacing;
-    }
-
-    protected override void Refill()
-    {
-        InstantiateForwards();
-        UpdateContentBounds();
-        UpdatePrevData();
     }
 
     protected void ReleaseForwards(in Vector2 position)
@@ -136,7 +131,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
         var count = content.childCount;
         if (count == 0) return;
         bool hl = horizontal;
-        var border = hl ? -content.anchoredPosition.x : -content.anchoredPosition.y;
+        var border = hl ? -position.x : -position.y;
         float itemEndPosition;
         for (int i = 0; i < count; i++)
         {
@@ -147,7 +142,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
                 itemEndPosition = item.anchoredPosition.x + LoopScrollViewHelper.GetAnchoredRightOffset(size, item.pivot.x);
                 if (itemEndPosition <= border)
                 {
-                    ReleaseItem(startIndex++, item);
+                    ReleaseItem(item, startIndex++);
                     startPosition = itemEndPosition + spacing;
                     continue;
                 }
@@ -157,7 +152,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
                 itemEndPosition = item.anchoredPosition.y + LoopScrollViewHelper.GetAnchoredBottomOffset(size, item.pivot.y);
                 if (itemEndPosition >= border)
                 {
-                    ReleaseItem(startIndex++, item);
+                    ReleaseItem(item, startIndex++);
                     startPosition = itemEndPosition - spacing;
                     continue;
                 }
@@ -187,7 +182,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
             if (vertical && itemStartPosition <= border)
                 break;
             var item = InstantiateItem(++endIndex); ;
-            onRefreshItem?.Invoke(endIndex, item);
+            onRefreshItem?.Invoke(item, endIndex);
             var pivot = item.pivot;
             var size = GetItemSize(item, endIndex);
             if (hl)
@@ -215,6 +210,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
                     boundEnd = endPosition;
                 }
             }
+            OnInstantiatedItem(item, endIndex, size);
         }
     }
 
@@ -224,7 +220,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
         if (count == 0) return;
 
         bool hl = horizontal;
-        var border = hl ? view.rect.width - content.anchoredPosition.x : -view.rect.height - content.anchoredPosition.y;
+        var border = hl ? view.rect.width - position.x : -view.rect.height - position.y;
 
         float itemStartPosition;
         for (int i = count - 1; i >= 0; i--)
@@ -236,7 +232,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
                 itemStartPosition = item.anchoredPosition.x + LoopScrollViewHelper.GetAnchoredLeftOffset(size, item.pivot.x);
                 if (itemStartPosition >= border)
                 {
-                    ReleaseItem(endIndex--, item);
+                    ReleaseItem(item, endIndex--);
                     endPosition = itemStartPosition - spacing;
                     continue;
                 }
@@ -246,7 +242,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
                 itemStartPosition = item.anchoredPosition.y + LoopScrollViewHelper.GetAnchoredTopOffset(size, item.pivot.y);
                 if (itemStartPosition <= border)
                 {
-                    ReleaseItem(endIndex--, item);
+                    ReleaseItem(item, endIndex--);
                     endPosition = itemStartPosition + spacing;
                     continue;
                 }
@@ -273,7 +269,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
             if (vertical && itemEndPosition >= border) break;
             var item = InstantiateItem(--startIndex);
             item.SetAsFirstSibling();
-            onRefreshItem?.Invoke(startIndex, item);
+            onRefreshItem?.Invoke(item, startIndex);
             var size = GetItemSize(item, startIndex);
             if (hl)
             {
@@ -301,47 +297,13 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
                     boundEnd = itemEndPosition;
                 }
             }
+            OnInstantiatedItem(item, startIndex, size);
         }
-    }
-
-    protected override void SetContentAnchoredPosition(Vector2 position, bool jump = false)
-    {
-        Vector2 currentPosition = content.anchoredPosition;
-        bool forward;
-        if (horizontal)
-        {
-            if (position.x == currentPosition.x) return;
-            forward = position.x < currentPosition.x;
-            position.y = currentPosition.y;
-        }
-        else
-        {
-            if (position.y == currentPosition.y) return;
-            forward = position.y > currentPosition.y;
-            position.x = currentPosition.x;
-        }
-
-        if (forward)
-        {
-            ReleaseForwards(position);
-            RepositionContent(position);
-            if (jump && content.childCount == 0)
-                OnInstantiateForwardsJump();
-            InstantiateForwards();
-        }
-        else
-        {
-            ReleaseBackwards(position);
-            RepositionContent(position);
-            if (jump && content.childCount == 0)
-                OnInstantiateBackwardsJump();
-            InstantiateBackwards();
-        }
-        UpdateContentBounds();
     }
 
     protected void RepositionContent(in Vector2 position)
     {
+        content.anchoredPosition = position;
         Vector2 offset = Vector2.zero;
         float add;
         if (horizontal)
@@ -378,10 +340,86 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
         boundEnd += add;
     }
 
-    protected abstract void OnInstantiateForwardsJump();
-    protected abstract void OnInstantiateBackwardsJump();
+    protected override void UpdateContentBounds()
+    {
+        if (movementType == MovementType.Unrestricted || totalCount < 0) return;
+        m_ContentBounds.center = m_ViewBounds.center;
+        m_ContentBounds.extents = m_ViewBounds.extents * 2;
+
+        if (startIndex > 0 && endIndex < totalCount - 1)
+            return;
+
+        var hl = horizontal;
+        var contentPosition = hl ? content.anchoredPosition.x : content.anchoredPosition.y;
+        var viewExtents = m_ViewBounds.extents;
+
+        if (everReachStart)
+        {
+            if (hl)
+            {
+                var min = m_ContentBounds.min;
+                min.x = boundStart + contentPosition - viewExtents.x;
+                m_ContentBounds.min = min;
+            }
+            else
+            {
+                var max = m_ContentBounds.max;
+                max.y = boundStart + contentPosition + viewExtents.y;
+                m_ContentBounds.max = max;
+            }
+        }
+
+        if (everReachEnd)
+        {
+            if (hl)
+            {
+                var max = m_ContentBounds.max;
+                max.x = boundEnd + contentPosition - viewExtents.x;
+                m_ContentBounds.max = max;
+            }
+            else
+            {
+                var min = m_ContentBounds.min;
+                min.y = boundEnd + contentPosition + viewExtents.y;
+                m_ContentBounds.min = min;
+            }
+        }
+        AdjustBounds();
+    }
+
     protected abstract void SetNormalizedPosition(float value);
+
+    protected override void UpdateScrollbars(Vector2 offset)
+    {
+        if (!m_Scrollbar || totalCount < 0)
+            return;
+
+        if (!working)
+        {
+            m_Scrollbar.size = 1;
+        }
+        else if (horizontal)
+        {
+            if (m_ContentBounds.min.x >= -m_ViewBounds.extents.x || m_ContentBounds.max.x <= m_ViewBounds.extents.x)
+                m_Scrollbar.size = Mathf.Clamp01((m_ViewBounds.size.x - Mathf.Abs(offset.x)) / expectTotalSize);
+            else
+                m_Scrollbar.size = Mathf.Clamp01(m_ViewBounds.size.x / expectTotalSize);
+        }
+        else
+        {
+            if (m_ContentBounds.min.y >= -m_ViewBounds.extents.y || m_ContentBounds.max.y <= m_ViewBounds.extents.y)
+                m_Scrollbar.size = Mathf.Clamp01((m_ViewBounds.size.y - Mathf.Abs(offset.y)) / expectTotalSize);
+            else
+                m_Scrollbar.size = Mathf.Clamp01(m_ViewBounds.size.y / expectTotalSize);
+
+        }
+        m_Scrollbar.value = normalizedValue;
+    }
+
     protected abstract float GetItemSize(RectTransform item, int index);
+
+    protected virtual void OnInstantiatedItem(RectTransform item, int index, float size) { }
+
     protected override void OnEnable()
     {
         base.OnEnable();

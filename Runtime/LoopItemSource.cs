@@ -1,16 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 [System.Serializable]
-public class LoopSource
+public class LoopItemSource
 {
     public GameObject template;
     private Queue<GameObject> cachedObjs;
 
     private static Transform s_PoolRoot;
 
-    ScrollRect src;
     public GameObject Get()
     {
         GameObject obj;
