@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class FixedTest : MonoBehaviour
 {
-    LoopScrollView loop;
+    LoopScroll loop;
     void Start()
     {
-        loop = GetComponent<LoopScrollView>();
+        loop = GetComponent<LoopScroll>();
     }
 
     public void ScrollTo(int index)

@@ -7,7 +7,7 @@ using System.Collections;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(RectTransform))]
-public abstract class LoopScrollView : UIBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IScrollHandler
+public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IScrollHandler
 {
     [Tooltip("Prefab Source")]
     public LoopItemSource prefabSource;

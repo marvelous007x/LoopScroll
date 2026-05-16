@@ -3,10 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.UI.ScrollRect;
 
-public abstract class LoopScrollViewOneDirection : LoopScrollView
+public abstract class LoopScrollHorizontalOrVertical : LoopScroll
 {
     public RectTransform.Axis direction;
-
     public override bool vertical => direction == RectTransform.Axis.Vertical;
     public override bool horizontal => direction == RectTransform.Axis.Horizontal;
 
@@ -139,7 +138,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
             var size = GetItemSize(item, startIndex);
             if (hl)
             {
-                itemEndPosition = item.anchoredPosition.x + LoopScrollViewHelper.GetAnchoredRightOffset(size, item.pivot.x);
+                itemEndPosition = item.anchoredPosition.x + LoopScrollHelper.GetAnchoredRightOffset(size, item.pivot.x);
                 if (itemEndPosition <= border)
                 {
                     ReleaseItem(item, startIndex++);
@@ -149,7 +148,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
             }
             else
             {
-                itemEndPosition = item.anchoredPosition.y + LoopScrollViewHelper.GetAnchoredBottomOffset(size, item.pivot.y);
+                itemEndPosition = item.anchoredPosition.y + LoopScrollHelper.GetAnchoredBottomOffset(size, item.pivot.y);
                 if (itemEndPosition >= border)
                 {
                     ReleaseItem(item, startIndex++);
@@ -187,12 +186,12 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
             var size = GetItemSize(item, endIndex);
             if (hl)
             {
-                value = itemStartPosition - LoopScrollViewHelper.GetAnchoredLeftOffset(size, pivot.x);
+                value = itemStartPosition - LoopScrollHelper.GetAnchoredLeftOffset(size, pivot.x);
                 endPosition = itemStartPosition + size;
             }
             else
             {
-                value = itemStartPosition - LoopScrollViewHelper.GetAnchoredTopOffset(size, pivot.y);
+                value = itemStartPosition - LoopScrollHelper.GetAnchoredTopOffset(size, pivot.y);
                 endPosition = itemStartPosition - size;
             }
             item.anchoredPosition = p;
@@ -229,7 +228,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
             var size = GetItemSize(item, endIndex);
             if (hl)
             {
-                itemStartPosition = item.anchoredPosition.x + LoopScrollViewHelper.GetAnchoredLeftOffset(size, item.pivot.x);
+                itemStartPosition = item.anchoredPosition.x + LoopScrollHelper.GetAnchoredLeftOffset(size, item.pivot.x);
                 if (itemStartPosition >= border)
                 {
                     ReleaseItem(item, endIndex--);
@@ -239,7 +238,7 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
             }
             else
             {
-                itemStartPosition = item.anchoredPosition.y + LoopScrollViewHelper.GetAnchoredTopOffset(size, item.pivot.y);
+                itemStartPosition = item.anchoredPosition.y + LoopScrollHelper.GetAnchoredTopOffset(size, item.pivot.y);
                 if (itemStartPosition <= border)
                 {
                     ReleaseItem(item, endIndex--);
@@ -273,12 +272,12 @@ public abstract class LoopScrollViewOneDirection : LoopScrollView
             var size = GetItemSize(item, startIndex);
             if (hl)
             {
-                value = itemEndPosition - LoopScrollViewHelper.GetAnchoredRightOffset(size, item.pivot.x);
+                value = itemEndPosition - LoopScrollHelper.GetAnchoredRightOffset(size, item.pivot.x);
                 startPosition = itemEndPosition - size;
             }
             else
             {
-                value = itemEndPosition - LoopScrollViewHelper.GetAnchoredBottomOffset(size, item.pivot.y);
+                value = itemEndPosition - LoopScrollHelper.GetAnchoredBottomOffset(size, item.pivot.y);
                 startPosition = itemEndPosition + size;
             }
             item.anchoredPosition = p;

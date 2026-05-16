@@ -1,7 +1,6 @@
 using System;
-using Unity.Mathematics;
 using UnityEngine;
-public class LoopScrollViewUnfixed : LoopScrollViewOneDirection
+public class LoopScrollFlex : LoopScrollHorizontalOrVertical
 {
     private float[] sizes;
     private float expectAverageSize, average;
