@@ -83,9 +83,9 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
         startIndex = offset;
         endIndex = offset - 1;
         working = true;
-        Setup();
+        Setup(true);
         UpdateViewBounds();
-        Refill();
+        Refill(true);
         // 处理有offset时，已经到最后一个元素就尝试向前塞元素
         if (totalCount > 0 && endIndex >= totalCount - 1 && offset > 0 && movementType != MovementType.Unrestricted)
         {
@@ -94,6 +94,35 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
                 positionOffset.x = m_ViewBounds.max.x - m_ContentBounds.max.x;
             if (vertical)
                 positionOffset.y = m_ViewBounds.min.y - m_ContentBounds.min.y;
+
+            if (positionOffset.x != 0 || positionOffset.y != 0)
+                SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
+        }
+        UpdateScrollbars(Vector2.zero);
+    }
+
+    public void RefillCellsBackwards(int index)
+    {
+        if (totalCount >= 0 && index >= totalCount) throw new Exception();
+        Clear();
+        endIndex = index;
+        startIndex = index + 1;
+        working = true;
+        Setup(false);
+        if (horizontal)
+            content.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, view.rect.width);
+        if (vertical)
+            content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, view.rect.height);
+
+        UpdateViewBounds();
+        Refill(false);
+        if (totalCount > 0 && startIndex == 0 && movementType != MovementType.Unrestricted)
+        {
+            var positionOffset = Vector2.zero;
+            if (horizontal)
+                positionOffset.x = m_ViewBounds.min.x - m_ContentBounds.min.x;
+            if (vertical)
+                positionOffset.y = m_ViewBounds.max.y - m_ContentBounds.max.y;
 
             if (positionOffset.x != 0 || positionOffset.y != 0)
                 SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
@@ -111,7 +140,7 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
         }
     }
 
-    private void Setup()
+    private void Setup(bool forwards)
     {
         StopMovement();
         var pos = content.anchoredPosition;
@@ -146,13 +175,13 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
         content.anchoredPosition = pos;
         m_VirtualContentOffset.x = 0;
         m_VirtualContentOffset.y = 0;
-        OnSetup();
+        OnSetup(forwards);
         UpdatePrevData();
     }
 
-    protected virtual void OnSetup() { }
+    protected virtual void OnSetup(bool forwards) { }
 
-    protected abstract void Refill();
+    protected abstract void Refill(bool fowards);
 
     public void ScrollToCell(int index, float speed, Action callBack = null)
     {
@@ -627,9 +656,9 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
             var size = Vector2.zero;
             size[expandAxis] = (scrollbar.transform as RectTransform).sizeDelta[expandAxis];
             if (xScrollingNeeded)
-                view.sizeDelta += size;
-            else
                 view.sizeDelta -= size;
+            else
+                view.sizeDelta += size;
             UpdateBounds();
         }
     }

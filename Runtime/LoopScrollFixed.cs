@@ -35,18 +35,22 @@ public class LoopScrollFixed : LoopScrollHorizontalOrVertical
         }
     }
 
-    protected override void OnSetup()
+    protected override void OnSetup(bool fowards)
     {
-        base.OnSetup();
+        base.OnSetup(fowards);
         var offset = size + spacing;
         expectTotalSize = offset * totalCount - spacing;
         if (horizontal) m_VirtualContentOffset.x = -offset * startIndex;
         else m_VirtualContentOffset.y = offset * startIndex;
     }
 
-    protected override void Refill()
+    protected override void Refill(bool forwards)
     {
-        InstantiateForwards();
+        if (forwards)
+            InstantiateForwards();
+        else
+            InstantiateBackwards();
+
         UpdateContentBounds();
     }
 

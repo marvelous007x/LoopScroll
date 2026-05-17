@@ -118,11 +118,24 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
     protected float boundStart, boundEnd;
     protected bool everReachStart, everReachEnd;
 
-    protected override void OnSetup()
+    protected override void OnSetup(bool forwards)
     {
         everReachStart = everReachEnd = false;
-        startPosition = 0;
-        endPosition = horizontal ? -spacing : spacing;
+        if (forwards)
+        {
+            startPosition = 0;
+            endPosition = horizontal ? -spacing : spacing;
+        }
+        else if (horizontal)
+        {
+            endPosition = view.rect.width;
+            startPosition = endPosition + spacing;
+        }
+        else
+        {
+            endPosition = -view.rect.height;
+            startPosition = endPosition - spacing;
+        }
     }
 
     protected void ReleaseForwards(in Vector2 position)

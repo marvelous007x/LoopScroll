@@ -41,9 +41,9 @@ public class LoopScrollFlex : LoopScrollHorizontalOrVertical
         }
     }
 
-    protected override void OnSetup()
+    protected override void OnSetup(bool forwards)
     {
-        base.OnSetup();
+        base.OnSetup(forwards);
         if (totalCount <= 0) return;
 
         var item = prefabSource.template.transform as RectTransform;
@@ -68,9 +68,12 @@ public class LoopScrollFlex : LoopScrollHorizontalOrVertical
         expectTotalSize = (size + spacing) * totalCount - spacing;
     }
 
-    protected override void Refill()
+    protected override void Refill(bool fowards)
     {
-        InstantiateForwards();
+        if (fowards)
+            InstantiateForwards();
+        else
+            InstantiateBackwards();
         UpdateContentBounds();
         UpdateContentSize();
         UpdatePrevData();
@@ -194,7 +197,7 @@ public class LoopScrollFlex : LoopScrollHorizontalOrVertical
         if (pValue != size)
         {
             sizes[index] = size;
-            average += (size - pValue)/sizes.Length;
+            average += (size - pValue) / sizes.Length;
         }
     }
 
