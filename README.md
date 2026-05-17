@@ -32,4 +32,4 @@ If element size is fixed, use `LoopScrollFixed`, you should set its size field, 
 
 - `ScrollSensitivity` in horizontal is negative of `ScrollRect.ScrollSensitivity` which applys to my habbit.
 
-- It can only fill elements from left or top now.
+- It can only fill elements from left or top now.If you want to fill from right or bottom,`RefillCells(totalCount - 1)` and reverse indexes will do the trick
