@@ -74,8 +74,8 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
             InstantiateForwards();
         else
             InstantiateBackwards();
-        UpdateContentBounds();
         UpdateContentSize();
+        UpdateContentBounds();
         UpdatePrevData();
     }
 
@@ -112,8 +112,8 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
                 OnBackwardsJump();
             InstantiateBackwards();
         }
-        UpdateContentBounds();
         UpdateContentSize();
+        UpdateContentBounds();
         noContentUpdate = true;
         UpdateScrollbars(Vector2.zero);
         noContentUpdate = false;

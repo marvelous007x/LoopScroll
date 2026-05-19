@@ -116,12 +116,6 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
 
     protected float startPosition, endPosition;
     protected float boundStart, boundEnd;
-    protected bool everReachStart, everReachEnd;
-
-    protected override void OnSetup(bool forwards)
-    {
-        everReachStart = everReachEnd = false;
-    }
 
     protected void RepositionContent(in Vector2 position)
     {
@@ -164,7 +158,7 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
 
     protected override void UpdateContentBounds()
     {
-        if (movementType == MovementType.Unrestricted || totalCount < 0) return;
+        if (movementType == MovementType.Unrestricted || totalCount <= 0) return;
         m_ContentBounds.center = m_ViewBounds.center;
         m_ContentBounds.extents = m_ViewBounds.extents * 2;
 
@@ -175,37 +169,68 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         var contentPosition = hl ? content.anchoredPosition.x : content.anchoredPosition.y;
         var viewExtents = m_ViewBounds.extents;
 
-        if (everReachStart)
+        bool hasStart = startIndex == 0;
+        bool hasEnd = endIndex == totalCount - 1;
+
+        var min = m_ContentBounds.min;
+        var max = m_ContentBounds.max;
+
+        if (hasStart)
         {
             if (hl)
             {
-                var min = m_ContentBounds.min;
                 min.x = boundStart + contentPosition - viewExtents.x;
                 m_ContentBounds.min = min;
             }
             else
             {
-                var max = m_ContentBounds.max;
                 max.y = boundStart + contentPosition + viewExtents.y;
                 m_ContentBounds.max = max;
             }
         }
 
-        if (everReachEnd)
+        if (hasEnd)
         {
             if (hl)
             {
-                var max = m_ContentBounds.max;
                 max.x = boundEnd + contentPosition - viewExtents.x;
                 m_ContentBounds.max = max;
             }
             else
             {
-                var min = m_ContentBounds.min;
                 min.y = boundEnd + contentPosition + viewExtents.y;
                 m_ContentBounds.min = min;
             }
         }
+
+        if (!hasStart)
+        {
+            if (hl)
+            {
+                min.x = max.x - expectTotalSize;
+                m_ContentBounds.min = min;
+            }
+            else
+            {
+                max.y = min.y + expectTotalSize;
+                m_ContentBounds.max = max;
+            }
+        }
+
+        if (!hasEnd)
+        {
+            if (hl)
+            {
+                max.x = min.x + expectTotalSize;
+                m_ContentBounds.max = max;
+            }
+            else
+            {
+                min.y = max.y - expectTotalSize;
+                m_ContentBounds.min = min;
+            }
+        }
+
         AdjustBounds();
     }
 

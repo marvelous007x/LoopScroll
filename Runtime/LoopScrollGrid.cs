@@ -399,13 +399,11 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
             {
                 if (lineStartIndex == 0)
                 {
-                    everReachStart = true;
                     boundStart = itemStartPosition;
                 }
 
                 if (endIndex == totalCount - 1)
                 {
-                    everReachEnd = true;
                     boundEnd = endPosition;
                 }
             }
@@ -535,13 +533,11 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
             {
                 if (lineStartIndex == 0)
                 {
-                    everReachStart = true;
                     boundStart = startPosition;
                 }
 
                 if (lineEndIndex == totalCount - 1)
                 {
-                    everReachEnd = true;
                     boundEnd = itemEndPosition;
                 }
             }

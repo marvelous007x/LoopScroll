@@ -99,13 +99,11 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
             {
                 if (endIndex == 0)
                 {
-                    everReachStart = true;
                     boundStart = itemStartPosition;
                 }
 
                 if (endIndex == totalCount - 1)
                 {
-                    everReachEnd = true;
                     boundEnd = endPosition;
                 }
             }
@@ -185,13 +183,11 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
             {
                 if (startIndex == 0)
                 {
-                    everReachStart = true;
                     boundStart = startPosition;
                 }
 
                 if (startIndex == totalCount - 1)
                 {
-                    everReachEnd = true;
                     boundEnd = itemEndPosition;
                 }
             }

@@ -4,8 +4,6 @@
 
 This project implements an recyclable list by referencing ScrollRect source code and LoopScrollRect, with the goal of completely abandoning LayoutGroup components.
 
-I have implemented for Horizontal/Vertical loop with one element each row/column.Grid is on the way.Probably will not implement for both direction since rare use cases.
-
 If element size is fixed, use `LoopScrollFixed`, you should set its size field, since it will ignore item's real size. Otherwise use `LoopScrollFlex`.
 
 ## Use
@@ -26,11 +24,15 @@ If element size is fixed, use `LoopScrollFixed`, you should set its size field, 
 
 - If you want element for auto size, functionally like `ContentSizeFitter` 、 `LayoutElment`, please implement your own script to immediately resize RectTransform size in `onRefreshItem` invokes. Maybe like `LayoutRebuilder.ForceRebuildLayoutImmediate`.
 
+- Won't implement dynamic size loop grid case. If you need, just group several items together as a single item and use `LoopScrollFlex`.
+
 ## Other Notes
 
 - Now it's simple and may lack lots of functions, but should be useable.
 
-- Padding is not added, as I think it's not that neccessary in my experience, may added someday later. Only spacing is offered now.
+- Probably will not implement for both directions since rare use cases.
+
+- Padding is not added, I'll see if it's that necessary, maybe add it someday later. Only spacing is offered now.
 
 - DO NOT CHANGE element position along loop direction.
 
