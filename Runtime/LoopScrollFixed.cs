@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class LoopScrollFixed : LoopScrollHorizontalOrVertical
+public class LoopScrollFixed : LoopScrollRowOrColumn
 {
     public float size;
     protected override float expectTotalSize

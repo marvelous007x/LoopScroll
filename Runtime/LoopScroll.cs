@@ -73,7 +73,7 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
     public Action<RectTransform, int> onReleaseItem;
     protected Vector2 m_VirtualContentOffset;
     protected int startIndex = 0, endIndex = -1;
-    private Vector2 itemAnchorMin, itemAnchorMax;
+    protected Vector2 itemAnchorMin, itemAnchorMax;
     protected bool working;
 
     public void RefillCells(int offset = 0)

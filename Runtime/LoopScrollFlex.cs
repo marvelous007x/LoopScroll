@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-public class LoopScrollFlex : LoopScrollHorizontalOrVertical
+public class LoopScrollFlex : LoopScrollRowOrColumn
 {
     private float[] sizes;
     private float expectAverageSize, average;

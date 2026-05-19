@@ -22,7 +22,7 @@ If element size is fixed, use `LoopScrollFixed`, you should set its size field, 
 
 ## Dynamic Case Notes
 
-- Scrollbar may be a little jittering, since I need to update predicted total size for all elements and scrollbar value every time when element changes. 
+- Scrollbar may be a little jittering, since I need to update predicted total size for all elements and scrollbar value every time when element changes.
 
 - If you want element for auto size, functionally like `ContentSizeFitter` 、 `LayoutElment`, please implement your own script to immediately resize RectTransform size in `onRefreshItem` invokes. Maybe like `LayoutRebuilder.ForceRebuildLayoutImmediate`.
 
@@ -30,7 +30,9 @@ If element size is fixed, use `LoopScrollFixed`, you should set its size field, 
 
 - Now it's simple and may lack lots of functions, but should be useable.
 
-- Padding is not added, as I think it's not realy neccessary in my experience. Only spacing is offered.
+- Padding is not added, as I think it's not that neccessary in my experience, may added someday later. Only spacing is offered now.
+
+- DO NOT CHANGE element position along loop direction.
 
 - `ScrollSensitivity` in horizontal is negative of `ScrollRect.ScrollSensitivity` which applys to my habbit.
 
