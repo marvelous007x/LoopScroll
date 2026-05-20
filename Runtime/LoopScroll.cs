@@ -10,7 +10,7 @@ using System.Collections;
 public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IScrollHandler
 {
     [Tooltip("Prefab Source")]
-    public LoopItemSource prefabSource;
+    public GameObjectPool prefabSource;
     [Tooltip("Total count, negative means INFINITE mode")]
     public int totalCount;
     public RectTransform view;

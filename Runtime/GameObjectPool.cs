@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class LoopItemSource
+public class GameObjectPool
 {
     public GameObject template;
     private Queue<GameObject> cachedObjs;
