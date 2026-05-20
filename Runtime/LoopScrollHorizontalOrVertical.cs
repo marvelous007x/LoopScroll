@@ -123,6 +123,93 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         alongViewSize = horizontal ? m_ViewBounds.size.x : m_ViewBounds.size.y;
     }
 
+    protected override void RefillCells(bool forwards)
+    {
+        Refill(forwards);
+        if (forwards)
+        {
+            if (AdjustToEnd())
+            {
+                AdjustToStart();
+                return;
+            }
+        }
+        else
+        {
+            if (AdjustToStart())
+                return;
+        }
+        UpdateContentBounds();
+        UpdateScrollbars(Vector2.zero);
+    }
+
+    private bool AdjustToEnd()
+    {
+        if (totalCount > 0 && startIndex > 0 && endIndex >= totalCount - 1 && movementType != MovementType.Unrestricted)
+        {
+            // if offset cause has space to end, reset position to reach end
+            var positionOffset = Vector2.zero;
+            float position;
+            var anchoredPosition = content.anchoredPosition;
+            if (horizontal)
+            {
+                position = anchoredPosition.x + endPosition;
+                if (position < alongViewSize)
+                {
+                    positionOffset.x = alongViewSize - position;
+                }
+            }
+            else
+            {
+                position = anchoredPosition.y + endPosition;
+                if (position > -alongViewSize)
+                {
+                    positionOffset.y = -alongViewSize - position;
+                }
+            }
+
+            if (positionOffset.x != 0 || positionOffset.y != 0)
+            {
+                SetContentAnchoredPosition(anchoredPosition + positionOffset);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private bool AdjustToStart()
+    {
+        if (totalCount > 0 && startIndex == 0 && movementType != MovementType.Unrestricted)
+        {
+            var positionOffset = Vector2.zero;
+            var anchoredPosition = content.anchoredPosition;
+            float position;
+            if (horizontal)
+            {
+                position = anchoredPosition.x + startPosition;
+                if (position > 0)
+                {
+                    positionOffset.x = -position;
+                }
+            }
+            else
+            {
+                position = anchoredPosition.y + startPosition;
+                if (position < 0)
+                {
+                    positionOffset.y = -position;
+                }
+            }
+
+            if (positionOffset.x != 0 || positionOffset.y != 0)
+            {
+                SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected void RepositionContent(in Vector2 position)
     {
         content.anchoredPosition = position;

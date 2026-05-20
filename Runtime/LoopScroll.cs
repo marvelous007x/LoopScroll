@@ -86,35 +86,7 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
         working = true;
         UpdateViewBounds();
         Setup(true);
-        Refill(true);
-        if (totalCount > 0 && offset > 0 && endIndex >= totalCount - 1 && movementType != MovementType.Unrestricted)
-        {
-            // if offset cause has space to end, reset position to reach end
-            var positionOffset = Vector2.zero;
-            if (horizontal && m_ViewBounds.max.x > m_ContentBounds.max.x)
-                positionOffset.x = m_ViewBounds.max.x - m_ContentBounds.max.x;
-            if (vertical && m_ViewBounds.min.y < m_ContentBounds.min.y)
-                positionOffset.y = m_ViewBounds.min.y - m_ContentBounds.min.y;
-
-            if (positionOffset.x != 0 || positionOffset.y != 0)
-            {
-                SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
-
-                // check again to reset position to reach start
-                positionOffset.x = positionOffset.y = 0;
-                if (horizontal && m_ViewBounds.min.x < m_ContentBounds.min.x)
-                    positionOffset.x = m_ViewBounds.min.x - m_ContentBounds.min.x;
-                if (vertical && m_ViewBounds.max.y > m_ContentBounds.max.y)
-                    positionOffset.y = m_ViewBounds.max.y - m_ContentBounds.max.y;
-
-                if (positionOffset.x != 0 || positionOffset.y != 0)
-                {
-                    SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
-                }
-                return;
-            }
-        }
-        UpdateScrollbars(Vector2.zero);
+        RefillCells(true);
     }
 
     public void RefillCellsBackwards(int index)
@@ -132,23 +104,7 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
             content.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x);
         if (vertical)
             content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
-
-        Refill(false);
-        if (totalCount > 0 && startIndex == 0 && movementType != MovementType.Unrestricted)
-        {
-            var positionOffset = Vector2.zero;
-            if (horizontal && m_ViewBounds.min.x < m_ContentBounds.min.x)
-                positionOffset.x = m_ViewBounds.min.x - m_ContentBounds.min.x;
-            if (vertical && m_ViewBounds.min.y < m_ContentBounds.min.y)
-                positionOffset.y = m_ViewBounds.max.y - m_ContentBounds.max.y;
-
-            if (positionOffset.x != 0 || positionOffset.y != 0)
-            {
-                SetContentAnchoredPosition(content.anchoredPosition + positionOffset);
-                return;
-            }
-        }
-        UpdateScrollbars(Vector2.zero);
+        RefillCells(false);
     }
 
     public void RefreshCells()
@@ -203,6 +159,7 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
     protected virtual void OnSetup(bool forwards) { }
 
     protected abstract void Refill(bool forwards);
+    protected abstract void RefillCells(bool forwards);
 
     public void ScrollToCell(int index, float speed, Action callBack = null)
     {

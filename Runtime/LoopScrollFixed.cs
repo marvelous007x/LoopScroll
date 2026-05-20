@@ -49,9 +49,7 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
             InstantiateForwards();
         else
             InstantiateBackwards();
-        UpdateContentBounds();
     }
-
 
     protected override void SetNormalizedPosition(float value)
     {

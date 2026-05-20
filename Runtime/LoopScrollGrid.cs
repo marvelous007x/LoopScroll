@@ -205,8 +205,6 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
             InstantiateForwards();
         else
             InstantiateBackwards();
-
-        UpdateContentBounds();
     }
 
     protected override void SetNormalizedPosition(float value)

@@ -72,8 +72,6 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
         else
             InstantiateBackwards();
         UpdateContentSize();
-        UpdateContentBounds();
-        UpdatePrevData();
     }
 
     protected override void SetContentAnchoredPosition(Vector2 position, bool jump = false)
