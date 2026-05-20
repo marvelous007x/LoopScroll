@@ -116,11 +116,11 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
 
     protected float startPosition, endPosition;
     protected float boundStart, boundEnd;
-    protected float viewSize;
+    protected float alongViewSize;
 
     protected override void OnSetup(bool forwards)
     {
-        viewSize = horizontal ? m_ViewBounds.size.x : m_ViewBounds.size.y;
+        alongViewSize = horizontal ? m_ViewBounds.size.x : m_ViewBounds.size.y;
     }
 
     protected void RepositionContent(in Vector2 position)
@@ -130,7 +130,7 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         float add;
         if (horizontal)
         {
-            if (Math.Abs(position.x) <= view.rect.width)
+            if (Math.Abs(position.x) <= alongViewSize)
             {
                 content.anchoredPosition = position;
                 return;
@@ -140,7 +140,7 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         }
         else
         {
-            if (Math.Abs(position.y) <= view.rect.height)
+            if (Math.Abs(position.y) <= alongViewSize)
             {
                 content.anchoredPosition = position;
                 return;
@@ -254,16 +254,16 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         else if (horizontal)
         {
             if (m_ContentBounds.min.x >= -m_ViewBounds.extents.x || m_ContentBounds.max.x <= m_ViewBounds.extents.x)
-                m_Scrollbar.size = Mathf.Clamp01((m_ViewBounds.size.x - Mathf.Abs(offset.x)) / expectTotalSize);
+                m_Scrollbar.size = Mathf.Clamp01((alongViewSize - Mathf.Abs(offset.x)) / expectTotalSize);
             else
-                m_Scrollbar.size = Mathf.Clamp01(m_ViewBounds.size.x / expectTotalSize);
+                m_Scrollbar.size = Mathf.Clamp01(alongViewSize / expectTotalSize);
         }
         else
         {
             if (m_ContentBounds.min.y >= -m_ViewBounds.extents.y || m_ContentBounds.max.y <= m_ViewBounds.extents.y)
-                m_Scrollbar.size = Mathf.Clamp01((m_ViewBounds.size.y - Mathf.Abs(offset.y)) / expectTotalSize);
+                m_Scrollbar.size = Mathf.Clamp01((alongViewSize - Mathf.Abs(offset.y)) / expectTotalSize);
             else
-                m_Scrollbar.size = Mathf.Clamp01(m_ViewBounds.size.y / expectTotalSize);
+                m_Scrollbar.size = Mathf.Clamp01(alongViewSize / expectTotalSize);
 
         }
         m_Scrollbar.value = normalizedValue;

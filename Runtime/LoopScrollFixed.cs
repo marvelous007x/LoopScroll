@@ -19,8 +19,7 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
 
             var position = GetVirtualContentPosition();
             var hl = horizontal;
-            var viewSize = hl ? m_ViewBounds.size.x : m_ViewBounds.size.y;
-            if (expectTotalSize <= viewSize || Mathf.Approximately(expectTotalSize, viewSize))
+            if (expectTotalSize <= alongViewSize || Mathf.Approximately(expectTotalSize, alongViewSize))
             {
                 if (hl)
                     return position.x < 0 ? 0 : 1;
@@ -29,9 +28,9 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
             }
 
             if (hl)
-                return -position.x / (expectTotalSize - viewSize);
+                return -position.x / (expectTotalSize - alongViewSize);
             else
-                return position.y / (expectTotalSize - viewSize);
+                return position.y / (expectTotalSize - alongViewSize);
         }
     }
 
@@ -62,7 +61,7 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
         if (horizontal) value = -value;
         Vector2 position = content.anchoredPosition;
         var newPosition = position;
-        newPosition[axis] = value * (expectTotalSize - m_ViewBounds.size[axis]) - m_VirtualContentOffset[axis];
+        newPosition[axis] = value * (expectTotalSize - alongViewSize) - m_VirtualContentOffset[axis];
         if (Mathf.Abs(newPosition[axis] - position[axis]) > 0.01f)
         {
             SetContentAnchoredPosition(newPosition, true);
@@ -140,12 +139,12 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
         if (hl)
         {
             virtualOffset = m_VirtualContentOffset.x;
-            virtualPosition = content.anchoredPosition.x + virtualOffset + m_ViewBounds.size.x;
+            virtualPosition = content.anchoredPosition.x + virtualOffset + alongViewSize;
         }
         else
         {
             virtualOffset = m_VirtualContentOffset.y;
-            virtualPosition = content.anchoredPosition.y + virtualOffset - m_ViewBounds.size.y;
+            virtualPosition = content.anchoredPosition.y + virtualOffset - alongViewSize;
         }
 
         startIndex = Mathf.CeilToInt(Math.Abs(virtualPosition) / offsetSize);

@@ -21,12 +21,11 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
                 return 0.5f;
 
             var hl = horizontal;
-            var viewSize = hl ? m_ViewBounds.size.x : m_ViewBounds.size.y;
             var position = startPosition +
                 (hl ? -startIndex * (expectAverageSize + spacing) + content.anchoredPosition.x
                     : startIndex * (expectAverageSize + spacing) + content.anchoredPosition.y);
 
-            if (expectTotalSize <= viewSize || Mathf.Approximately(expectTotalSize, viewSize))
+            if (expectTotalSize <= alongViewSize || Mathf.Approximately(expectTotalSize, alongViewSize))
             {
                 if (hl)
                     return position < 0 ? 0 : 1;
@@ -35,9 +34,9 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
             }
 
             if (hl)
-                return -position / (expectTotalSize - viewSize);
+                return -position / (expectTotalSize - alongViewSize);
             else
-                return position / (expectTotalSize - viewSize);
+                return position / (expectTotalSize - alongViewSize);
         }
     }
 
@@ -47,20 +46,18 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
         if (totalCount <= 0) return;
 
         var item = prefabSource.template.transform as RectTransform;
-        float size, viewSize;
+        float size;
         if (horizontal)
         {
             size = item.rect.width;
-            viewSize = view.rect.width;
         }
         else
         {
             size = item.rect.height;
-            viewSize = view.rect.height;
         }
 
         size = Mathf.Max(0, size);
-        var count = Mathf.CeilToInt(viewSize / (size + spacing) * 1.5f);
+        var count = Mathf.CeilToInt(alongViewSize / (size + spacing) * 1.5f);
         count = Math.Min(Math.Max(count, 10), totalCount);
         sizes = new float[count];
         Array.Fill(sizes, size);
@@ -127,15 +124,13 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
 
         Vector2 position = content.anchoredPosition;
         var newPosition = position;
-        float offset;
+        float offset = (value - pNormalizedValue) * (expectTotalSize - alongViewSize);
         if (horizontal)
         {
-            offset = (value - pNormalizedValue) * (expectTotalSize - m_ViewBounds.size.x);
             newPosition.x -= offset;
         }
         else
         {
-            offset = (value - pNormalizedValue) * (expectTotalSize - m_ViewBounds.size.y);
             newPosition.y += offset;
         }
 
@@ -171,11 +166,11 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
         int count;
         if (horizontal)
         {
-            count = Mathf.FloorToInt((position - m_ViewBounds.size.x) / offsetSize);
+            count = Mathf.FloorToInt((position - alongViewSize) / offsetSize);
         }
         else
         {
-            count = Mathf.FloorToInt((-position - m_ViewBounds.size.y) / offsetSize);
+            count = Mathf.FloorToInt((-position - alongViewSize) / offsetSize);
         }
 
         startIndex -= count;

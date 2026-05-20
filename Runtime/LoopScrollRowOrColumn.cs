@@ -14,12 +14,12 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         }
         else if (horizontal)
         {
-            endPosition = viewSize;
+            endPosition = alongViewSize;
             startPosition = endPosition + spacing;
         }
         else
         {
-            endPosition = -viewSize;
+            endPosition = -alongViewSize;
             startPosition = endPosition - spacing;
         }
     }
@@ -66,7 +66,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         var count = content.childCount;
         var contentPosition = hl ? content.anchoredPosition.x : content.anchoredPosition.y;
 
-        float border = hl ? (view.rect.width - contentPosition) : (-view.rect.height - contentPosition);
+        float border = hl ? (alongViewSize - contentPosition) : (-alongViewSize - contentPosition);
         var p = (prefabSource.template.transform as RectTransform).anchoredPosition;
         ref float value = ref (hl ? ref p.x : ref p.y);
         var spacingOffset = hl ? spacing : -spacing;
@@ -116,7 +116,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         if (count == 0) return;
 
         bool hl = horizontal;
-        var border = hl ? view.rect.width - position.x : -view.rect.height - position.y;
+        var border = hl ? alongViewSize - position.x : -alongViewSize - position.y;
 
         float itemStartPosition;
         for (int i = count - 1; i >= 0; i--)
