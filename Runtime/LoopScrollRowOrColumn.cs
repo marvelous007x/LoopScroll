@@ -14,12 +14,12 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         }
         else if (horizontal)
         {
-            endPosition = view.rect.width;
+            endPosition = viewSize;
             startPosition = endPosition + spacing;
         }
         else
         {
-            endPosition = -view.rect.height;
+            endPosition = -viewSize;
             startPosition = endPosition - spacing;
         }
     }

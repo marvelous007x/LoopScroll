@@ -35,9 +35,9 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
         }
     }
 
-    protected override void OnSetup(bool fowards)
+    protected override void OnSetup(bool forwards)
     {
-        base.OnSetup(fowards);
+        base.OnSetup(forwards);
         var offset = size + spacing;
         expectTotalSize = offset * totalCount - spacing;
         if (horizontal) m_VirtualContentOffset.x = -offset * startIndex;
@@ -50,9 +50,9 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
             InstantiateForwards();
         else
             InstantiateBackwards();
-
         UpdateContentBounds();
     }
+
 
     protected override void SetNormalizedPosition(float value)
     {

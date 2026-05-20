@@ -116,6 +116,12 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
 
     protected float startPosition, endPosition;
     protected float boundStart, boundEnd;
+    protected float viewSize;
+
+    protected override void OnSetup(bool forwards)
+    {
+        viewSize = horizontal ? m_ViewBounds.size.x : m_ViewBounds.size.y;
+    }
 
     protected void RepositionContent(in Vector2 position)
     {
