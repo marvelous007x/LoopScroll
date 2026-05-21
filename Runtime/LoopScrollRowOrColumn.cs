@@ -34,7 +34,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         for (int i = 0; i < count; i++)
         {
             var item = content.GetChild(0) as RectTransform;
-            var size = GetItemSize(item, startIndex);
+            var size = GetItemSize(item, startIndex, false);
             if (hl)
             {
                 itemEndPosition = item.anchoredPosition.x + LoopScrollHelper.GetAnchoredRightOffset(size, item.pivot.x);
@@ -82,7 +82,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
             var item = InstantiateItem(++endIndex); ;
             onRefreshItem?.Invoke(item, endIndex);
             var pivot = item.pivot;
-            var size = GetItemSize(item, endIndex);
+            var size = GetItemSize(item, endIndex, true);
             if (hl)
             {
                 value = itemStartPosition - LoopScrollHelper.GetAnchoredLeftOffset(size, pivot.x);
@@ -94,7 +94,6 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
                 endPosition = itemStartPosition - size;
             }
             item.anchoredPosition = p;
-            OnInstantiatedItem(item, endIndex, size);
             if (totalCount > 0)
             {
                 if (endIndex == 0)
@@ -122,7 +121,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         for (int i = count - 1; i >= 0; i--)
         {
             var item = content.GetChild(i) as RectTransform;
-            var size = GetItemSize(item, endIndex);
+            var size = GetItemSize(item, endIndex, false);
             if (hl)
             {
                 itemStartPosition = item.anchoredPosition.x + LoopScrollHelper.GetAnchoredLeftOffset(size, item.pivot.x);
@@ -166,7 +165,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
             var item = InstantiateItem(--startIndex);
             item.SetAsFirstSibling();
             onRefreshItem?.Invoke(item, startIndex);
-            var size = GetItemSize(item, startIndex);
+            var size = GetItemSize(item, startIndex, true);
             if (hl)
             {
                 value = itemEndPosition - LoopScrollHelper.GetAnchoredRightOffset(size, item.pivot.x);
@@ -191,11 +190,9 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
                     boundEnd = itemEndPosition;
                 }
             }
-            OnInstantiatedItem(item, startIndex, size);
         }
     }
 
-    protected abstract float GetItemSize(RectTransform item, int index);
-    protected virtual void OnInstantiatedItem(RectTransform item, int index, float size) { }
+    protected abstract float GetItemSize(RectTransform item, int index, bool isInstantiate);
 
 }

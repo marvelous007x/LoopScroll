@@ -142,7 +142,7 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         UpdateContentBounds();
         UpdateScrollbars(Vector2.zero);
     }
-
+    protected abstract void Refill(bool forwards);
     private bool AdjustToEnd()
     {
         if (totalCount > 0 && startIndex > 0 && endIndex >= totalCount - 1 && movementType != MovementType.Unrestricted)

@@ -151,7 +151,7 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
         endPosition = startPosition + (hl ? -spacing : spacing);
     }
 
-    protected override float GetItemSize(RectTransform item, int index)
+    protected override float GetItemSize(RectTransform item, int index, bool isInstantiate)
     {
         return size;
     }

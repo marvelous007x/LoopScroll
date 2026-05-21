@@ -177,21 +177,20 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
         endPosition = startPosition + (hl ? -spacing : spacing);
     }
 
-    protected override float GetItemSize(RectTransform item, int index)
+    protected override float GetItemSize(RectTransform item, int index, bool isInstantiate)
     {
-        return horizontal ? item.rect.width : item.rect.height;
-    }
-
-    protected override void OnInstantiatedItem(RectTransform item, int index, float size)
-    {
-        if (totalCount <= 0) return;
-        index %= sizes.Length;
-        var pValue = sizes[index];
-        if (pValue != size)
+        var size = horizontal ? item.rect.width : item.rect.height;
+        if (isInstantiate && totalCount > 0)
         {
-            sizes[index] = size;
-            average += (size - pValue) / sizes.Length;
+            index %= sizes.Length;
+            var pValue = sizes[index];
+            if (pValue != size)
+            {
+                sizes[index] = size;
+                average += (size - pValue) / sizes.Length;
+            }
         }
+        return size;
     }
 
     protected void UpdateContentSize()

@@ -157,8 +157,6 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
     }
 
     protected virtual void OnSetup(bool forwards) { }
-
-    protected abstract void Refill(bool forwards);
     protected abstract void RefillCells(bool forwards);
 
     public void ScrollToCell(int index, float speed, Action callBack = null)
