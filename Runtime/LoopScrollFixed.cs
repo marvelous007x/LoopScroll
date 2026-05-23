@@ -39,8 +39,18 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
         base.OnSetup(forwards);
         var offset = size + spacing;
         expectTotalSize = offset * totalCount - spacing;
-        if (horizontal) m_VirtualContentOffset.x = -offset * startIndex;
-        else m_VirtualContentOffset.y = offset * startIndex;
+        var virtualOffsetSize = offset * startIndex;
+        if (!forwards)
+            virtualOffsetSize -= alongViewSize + spacing;
+
+        if (horizontal)
+        {
+            m_VirtualContentOffset.x = -virtualOffsetSize;
+        }
+        else
+        {
+            m_VirtualContentOffset.y = virtualOffsetSize;
+        }
     }
 
     protected override void Refill(bool forwards)
