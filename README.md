@@ -41,3 +41,5 @@ If element size is fixed, use `LoopScrollFixed`, you should set its size field, 
 - For auto expand view scrollbar, I just expand view size by its pivot. So set view anchor pivot properly if you use auto hide and expand viewport scrollbar.
 
 - `enableDragInParent` lets you to pass drag events to parents.For example, if you have loop horizontals in loop vertical, you can drag vertically for the vertical loop without affecting horizontals, and drag horizontally for a horizontal loop without affecting the vertical loop. Whether it's a horizontal or vertical drag is judged in `OnBeginDrag` by checking whick direction of dragged offset is larger.
+
+- Common layout field values MUST be set before called `RefillCell`, does not support changing when and after refilling items.
