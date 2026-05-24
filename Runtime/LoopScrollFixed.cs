@@ -147,12 +147,12 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
         if (hl)
         {
             virtualOffset = m_VirtualContentOffset.x;
-            virtualPosition = content.anchoredPosition.x + virtualOffset + alongViewSize;
+            virtualPosition = content.anchoredPosition.x + virtualOffset - alongViewSize;
         }
         else
         {
             virtualOffset = m_VirtualContentOffset.y;
-            virtualPosition = content.anchoredPosition.y + virtualOffset - alongViewSize;
+            virtualPosition = content.anchoredPosition.y + virtualOffset + alongViewSize;
         }
 
         startIndex = Mathf.CeilToInt(Math.Abs(virtualPosition) / offsetSize);

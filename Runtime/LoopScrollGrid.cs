@@ -49,6 +49,13 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
 
     protected override void OnSetup(bool forwards)
     {
+
+        if (cellSize.x <= 0 || cellSize.y <= 0)
+            throw new Exception("Item cell size must be greater than zero");
+
+        if (cellSize.x + spacing.x <= 0 || cellSize.y + spacing.y <= 0)
+            throw new Exception("Item cell size + spacing must be greater than zero");
+
         base.OnSetup(forwards);
         RefreshAnotherValues();
         if (forwards)
@@ -111,6 +118,7 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
             anotherSize = cellSize.x;
             anotherSpacing = spacing.x;
         }
+
         anotherCount = Mathf.FloorToInt((size + anotherSpacing) / (anotherSize + anotherSpacing));
         if (anotherCount <= 0) anotherCount = 1;
     }
@@ -237,7 +245,7 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
         if (horizontal)
         {
             var offset = cellSize.x + spacing.x;
-            var virtualPosition = content.anchoredPosition.x + m_VirtualContentOffset.x + alongViewSize;
+            var virtualPosition = content.anchoredPosition.x + m_VirtualContentOffset.x - alongViewSize;
             startIndex = Mathf.CeilToInt(Math.Abs(virtualPosition) / offset);
             startPosition = startIndex * offset + m_VirtualContentOffset.x;
             endPosition = startPosition - spacing.x;
@@ -245,11 +253,12 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
         else
         {
             var offset = cellSize.y + spacing.y;
-            var virtualPosition = content.anchoredPosition.y + m_VirtualContentOffset.y - alongViewSize;
+            var virtualPosition = content.anchoredPosition.y + m_VirtualContentOffset.y + alongViewSize;
             startIndex = Mathf.CeilToInt(Math.Abs(virtualPosition) / offset);
             startPosition = startIndex * -offset + m_VirtualContentOffset.y;
             endPosition = startPosition + spacing.y;
         }
+        startIndex *= anotherCount;
         endIndex = startIndex - 1;
     }
 
@@ -439,7 +448,7 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
             int lineEndIndex = startIndex - 1;
             if (totalCount > 0 && startIndex >= totalCount)
             {
-                lineStartIndex = startIndex / anotherCount * anotherCount;
+                lineStartIndex = (startIndex - 1) / anotherCount * anotherCount;
                 lineStartValue = anotherPositionOffset + offsetSize * (lineEndIndex - lineStartIndex);
             }
             else

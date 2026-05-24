@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -42,8 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -96,8 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: 12716f1d6b2aa0042a0ff5b88becfea4,
-    type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: 12716f1d6b2aa0042a0ff5b88becfea4, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -1386,7 +1382,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 50
+          m_IntArgument: 399
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -1461,9 +1457,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -500, y: 250}
+  m_AnchoredPosition: {x: -500, y: 0}
   m_SizeDelta: {x: 200, y: 500}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!1 &481982215
 GameObject:
   m_ObjectHideFlags: 0
@@ -2104,7 +2100,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 98
+          m_IntArgument: 99
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -3724,7 +3720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabSource:
     template: {fileID: 2096568083}
-  totalCount: 100
+  totalCount: 20
   view: {fileID: 2040157989}
   content: {fileID: 469829727}
   enableDragInParent: 0
@@ -3736,10 +3732,10 @@ MonoBehaviour:
   direction: 0
   m_Scrollbar: {fileID: 622504123}
   m_ScrollbarVisibility: 0
-  m_CellSize: {x: 100, y: 150}
-  m_Spacing: {x: 20, y: 10}
-  m_AnotherCount: 2
-  m_AnotherCountFlexible: 1
+  cellSize: {x: 100, y: 150}
+  spacing: {x: 10, y: 10}
+  anotherCount: 1
+  anotherCountFlexible: 0
   startSide: 0
 --- !u!114 &1032951954
 MonoBehaviour:
@@ -6517,7 +6513,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabSource:
     template: {fileID: 840046589}
-  totalCount: 99
+  totalCount: 100
   view: {fileID: 1436190464}
   content: {fileID: 1365168272}
   enableDragInParent: 0
@@ -6529,10 +6525,10 @@ MonoBehaviour:
   direction: 1
   m_Scrollbar: {fileID: 120315637}
   m_ScrollbarVisibility: 0
-  m_CellSize: {x: 80, y: 100}
-  m_Spacing: {x: 15, y: 10}
-  m_AnotherCount: 5
-  m_AnotherCountFlexible: 0
+  cellSize: {x: 80, y: 100}
+  spacing: {x: 10, y: 10}
+  anotherCount: 2
+  anotherCountFlexible: 0
   startSide: 1
 --- !u!114 &2006310485
 MonoBehaviour:
