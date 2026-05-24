@@ -93,6 +93,9 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         }
     }
 
+    [Tooltip("X means padding from start, Y means padding from end")]
+    public Vector2 padding;
+
     protected abstract float expectTotalSize { get; set; }
 
     protected abstract float normalizedValue
@@ -125,7 +128,24 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
 
     protected override void RefillCells(bool forwards)
     {
-        Refill(forwards);
+        if (forwards)
+            InstantiateForwards();
+        else
+            InstantiateBackwards();
+
+        if (forwards)
+        {
+            if (padding.x > 0 && (totalCount < 0 || startIndex > 0))
+                InstantiateBackwards();
+        }
+        else
+        {
+            if (padding.y > 0 && (totalCount < 0 || endIndex < totalCount - 1))
+                InstantiateForwards();
+        }
+
+        OnRefilled();
+
         if (forwards)
         {
             if (AdjustToEnd())
@@ -142,7 +162,9 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         UpdateContentBounds();
         UpdateScrollbars(Vector2.zero);
     }
-    protected abstract void Refill(bool forwards);
+
+    protected virtual void OnRefilled() { }
+
     private bool AdjustToEnd()
     {
         if (totalCount > 0 && startIndex > 0 && endIndex >= totalCount - 1 && movementType != MovementType.Unrestricted)
@@ -153,7 +175,7 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
             var anchoredPosition = content.anchoredPosition;
             if (horizontal)
             {
-                position = anchoredPosition.x + endPosition;
+                position = anchoredPosition.x + endPosition + padding.y;
                 if (position < alongViewSize)
                 {
                     positionOffset.x = alongViewSize - position;
@@ -161,7 +183,7 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
             }
             else
             {
-                position = anchoredPosition.y + endPosition;
+                position = anchoredPosition.y + endPosition - padding.y;
                 if (position > -alongViewSize)
                 {
                     positionOffset.y = -alongViewSize - position;
@@ -186,7 +208,7 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
             float position;
             if (horizontal)
             {
-                position = anchoredPosition.x + startPosition;
+                position = anchoredPosition.x + startPosition - padding.x;
                 if (position > 0)
                 {
                     positionOffset.x = -position;
@@ -194,7 +216,7 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
             }
             else
             {
-                position = anchoredPosition.y + startPosition;
+                position = anchoredPosition.y + startPosition + padding.x;
                 if (position < 0)
                 {
                     positionOffset.y = -position;
@@ -272,12 +294,12 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         {
             if (hl)
             {
-                min.x = boundStart + contentPosition - viewExtents.x;
+                min.x = boundStart - padding.x + contentPosition - viewExtents.x;
                 m_ContentBounds.min = min;
             }
             else
             {
-                max.y = boundStart + contentPosition + viewExtents.y;
+                max.y = boundStart + padding.x + contentPosition + viewExtents.y;
                 m_ContentBounds.max = max;
             }
         }
@@ -286,12 +308,12 @@ public abstract class LoopScrollHorizontalOrVertical : LoopScroll
         {
             if (hl)
             {
-                max.x = boundEnd + contentPosition - viewExtents.x;
+                max.x = boundEnd + padding.y + contentPosition - viewExtents.x;
                 m_ContentBounds.max = max;
             }
             else
             {
-                min.y = boundEnd + contentPosition + viewExtents.y;
+                min.y = boundEnd - padding.y + contentPosition + viewExtents.y;
                 m_ContentBounds.min = min;
             }
         }

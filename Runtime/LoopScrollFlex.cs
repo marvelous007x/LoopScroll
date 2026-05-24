@@ -22,8 +22,8 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
 
             var hl = horizontal;
             var position = startPosition +
-                (hl ? -startIndex * (expectAverageSize + spacing) + content.anchoredPosition.x
-                    : startIndex * (expectAverageSize + spacing) + content.anchoredPosition.y);
+                (hl ? -startIndex * (expectAverageSize + spacing) + content.anchoredPosition.x - padding.x
+                    : startIndex * (expectAverageSize + spacing) + content.anchoredPosition.y + padding.x);
 
             if (expectTotalSize <= alongViewSize || Mathf.Approximately(expectTotalSize, alongViewSize))
             {
@@ -62,15 +62,11 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
         sizes = new float[count];
         Array.Fill(sizes, size);
         expectAverageSize = average = size;
-        expectTotalSize = (size + spacing) * totalCount - spacing;
+        expectTotalSize = (size + spacing) * totalCount - spacing + padding.x + padding.y;
     }
 
-    protected override void Refill(bool fowards)
+    protected override void OnRefilled()
     {
-        if (fowards)
-            InstantiateForwards();
-        else
-            InstantiateBackwards();
         UpdateContentSize();
     }
 
@@ -198,7 +194,7 @@ public class LoopScrollFlex : LoopScrollRowOrColumn
         if (totalCount <= 0) return;
         expectAverageSize = average;
         var visibleSize = horizontal ? endPosition - startPosition : startPosition - endPosition;
-        expectTotalSize = (startIndex + totalCount - 1 - endIndex) * (average + spacing) + visibleSize;
+        expectTotalSize = (startIndex + totalCount - 1 - endIndex) * (average + spacing) + visibleSize + padding.x + padding.y;
     }
 
     protected override void UpdateScrollbars(Vector2 offset)

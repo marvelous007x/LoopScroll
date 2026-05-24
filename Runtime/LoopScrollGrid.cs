@@ -49,7 +49,6 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
 
     protected override void OnSetup(bool forwards)
     {
-
         if (cellSize.x <= 0 || cellSize.y <= 0)
             throw new Exception("Item cell size must be greater than zero");
 
@@ -57,12 +56,22 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
             throw new Exception("Item cell size + spacing must be greater than zero");
 
         base.OnSetup(forwards);
+        var hl = horizontal;
         RefreshAnotherValues();
         if (forwards)
         {
-            startPosition = 0;
             startIndex = startIndex / anotherCount * anotherCount;
-            endPosition = horizontal ? -spacing.x : spacing.y;
+            if (hl)
+            {
+                startPosition = padding.x;
+                endPosition = startPosition - spacing.x;
+            }
+            else
+            {
+                startPosition = -padding.x;
+                endPosition = startPosition + spacing.y;
+            }
+
         }
         else
         {
@@ -70,29 +79,41 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
             if (totalCount > 0) startIndex = Math.Min(startIndex, totalCount);
             if (horizontal)
             {
-                endPosition = alongViewSize;
+                endPosition = alongViewSize - padding.y;
                 startPosition = endPosition + spacing.x;
             }
             else
             {
-                endPosition = -alongViewSize;
+                endPosition = -alongViewSize + padding.y;
                 startPosition = endPosition - spacing.y;
             }
         }
         endIndex = startIndex - 1;
-
         var count = (totalCount - 1) / anotherCount + 1;
-        if (horizontal)
+
+        float offsetSize, spacingSize;
+        if (hl)
         {
-            var offset = cellSize.x + spacing.x;
-            expectTotalSize = offset * count - spacing.x;
-            m_VirtualContentOffset.x = -offset * (startIndex / anotherCount) + startPosition;
+            offsetSize = cellSize.x + spacing.x;
+            spacingSize = spacing.x;
         }
         else
         {
-            var offset = cellSize.y + spacing.y;
-            expectTotalSize = offset * count - spacing.y;
-            m_VirtualContentOffset.y = offset * (startIndex / anotherCount) + startPosition;
+            offsetSize = cellSize.y + spacing.y;
+            spacingSize = spacing.y;
+        }
+        expectTotalSize = offsetSize * count - spacingSize + padding.x + padding.y;
+        float virtualOffsetSize = padding.x + offsetSize * (startIndex / anotherCount);
+        if (!forwards)
+            virtualOffsetSize += padding.x + padding.y - alongViewSize - spacingSize;
+
+        if (hl)
+        {
+            m_VirtualContentOffset.x = -virtualOffsetSize;
+        }
+        else
+        {
+            m_VirtualContentOffset.y = virtualOffsetSize;
         }
     }
 
@@ -160,14 +181,6 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
             anotherPositionOffset += (contentSize - size) / 2;
     }
 
-    protected override void Refill(bool forwards)
-    {
-        if (forwards)
-            InstantiateForwards();
-        else
-            InstantiateBackwards();
-    }
-
     protected override void SetNormalizedPosition(float value)
     {
         if (normalizedValue == value) return;
@@ -223,20 +236,23 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
     {
         if (horizontal)
         {
-            var offset = cellSize.x + spacing.x;
+            var offsetSize = cellSize.x + spacing.x;
+            var virtualOffset = m_VirtualContentOffset.x;
             var virtualPosition = content.anchoredPosition.x + m_VirtualContentOffset.x;
-            startIndex = Mathf.FloorToInt(Math.Abs(virtualPosition) / offset);
-            startPosition = startIndex * offset + m_VirtualContentOffset.x;
+            startIndex = Mathf.FloorToInt((-(virtualPosition + padding.x)) / offsetSize);
+            startPosition = startIndex * offsetSize + padding.x + virtualOffset;
             endPosition = startPosition - spacing.x;
         }
         else
         {
-            var offset = cellSize.y + spacing.y;
+            var offsetSize = cellSize.y + spacing.y;
+            var virtualOffset = m_VirtualContentOffset.y;
             var virtualPosition = content.anchoredPosition.y + m_VirtualContentOffset.y;
-            startIndex = Mathf.FloorToInt(Math.Abs(virtualPosition) / offset);
-            startPosition = startIndex * -offset + m_VirtualContentOffset.y;
+            startIndex = Mathf.FloorToInt((virtualPosition - padding.x) / offsetSize);
+            startPosition = -startIndex * offsetSize - padding.x + virtualOffset;
             endPosition = startPosition + spacing.y;
         }
+        startIndex *= anotherCount;
         endIndex = startIndex - 1;
     }
 
@@ -244,25 +260,27 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
     {
         if (horizontal)
         {
-            var offset = cellSize.x + spacing.x;
-            var virtualPosition = content.anchoredPosition.x + m_VirtualContentOffset.x - alongViewSize;
-            startIndex = Mathf.CeilToInt(Math.Abs(virtualPosition) / offset);
-            startPosition = startIndex * offset + m_VirtualContentOffset.x;
+            var offsetSize = cellSize.x + spacing.x;
+            var virtualOffset = m_VirtualContentOffset.x;
+            var virtualPosition = content.anchoredPosition.x + virtualOffset;
+            startIndex = Mathf.CeilToInt(-(virtualPosition - alongViewSize + padding.x) / offsetSize);
+            startPosition = startIndex * offsetSize + padding.x + virtualOffset;
             endPosition = startPosition - spacing.x;
         }
         else
         {
-            var offset = cellSize.y + spacing.y;
-            var virtualPosition = content.anchoredPosition.y + m_VirtualContentOffset.y + alongViewSize;
-            startIndex = Mathf.CeilToInt(Math.Abs(virtualPosition) / offset);
-            startPosition = startIndex * -offset + m_VirtualContentOffset.y;
+            var offsetSize = cellSize.y + spacing.y;
+            var virtualOffset = m_VirtualContentOffset.y;
+            var virtualPosition = content.anchoredPosition.y + virtualOffset;
+            startIndex = Mathf.CeilToInt((virtualPosition + alongViewSize - padding.x) / offsetSize);
+            startPosition = -startIndex * offsetSize - padding.x + virtualOffset;
             endPosition = startPosition + spacing.y;
         }
         startIndex *= anotherCount;
         endIndex = startIndex - 1;
     }
 
-    protected void ReleaseForwards(in Vector2 position)
+    protected override void ReleaseForwards(in Vector2 position)
     {
         var count = content.childCount;
         if (count == 0) return;
@@ -297,7 +315,7 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
         }
     }
 
-    protected void InstantiateForwards()
+    protected override void InstantiateForwards()
     {
         if (totalCount == 0) return;
         bool hl = horizontal;
@@ -369,7 +387,7 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
         }
     }
 
-    protected void ReleaseBackwards(in Vector2 position)
+    protected override void ReleaseBackwards(in Vector2 position)
     {
         var count = content.childCount;
         if (count == 0) return;
@@ -405,7 +423,7 @@ public class LoopScrollGrid : LoopScrollHorizontalOrVertical
         }
     }
 
-    protected void InstantiateBackwards()
+    protected override void InstantiateBackwards()
     {
         if (totalCount == 0) return;
         bool hl = horizontal;

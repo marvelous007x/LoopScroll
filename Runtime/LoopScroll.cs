@@ -78,6 +78,8 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
 
     public void RefillCells(int offset = 0)
     {
+        if (view == null || content == null)
+            throw new Exception("View or content can not be null");
         if (totalCount >= 0 && offset >= totalCount)
             throw new Exception("Offset out of range");
         Clear();
@@ -479,7 +481,7 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
 
     protected virtual void LateUpdate()
     {
-        if (!content)
+        if (!working)
             return;
 
         float deltaTime = Time.unscaledDeltaTime;
@@ -558,6 +560,10 @@ public abstract class LoopScroll : UIBehaviour, IInitializePotentialDragHandler,
         }
     }
 
+    protected abstract void ReleaseForwards(in Vector2 position);
+    protected abstract void InstantiateForwards();
+    protected abstract void ReleaseBackwards(in Vector2 position);
+    protected abstract void InstantiateBackwards();
     protected abstract void SetContentAnchoredPosition(Vector2 position, bool jump = false);
 
     protected Vector2 GetVirtualContentPosition()

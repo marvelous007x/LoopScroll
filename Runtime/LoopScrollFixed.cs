@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class LoopScrollFixed : LoopScrollRowOrColumn
@@ -38,10 +37,12 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
     {
         base.OnSetup(forwards);
         var offset = size + spacing;
-        expectTotalSize = offset * totalCount - spacing;
+        expectTotalSize = offset * totalCount - spacing + padding.x + padding.y;
         var virtualOffsetSize = offset * startIndex;
         if (!forwards)
-            virtualOffsetSize -= alongViewSize + spacing;
+        {
+            virtualOffsetSize += padding.x + padding.y - alongViewSize - spacing;
+        }
 
         if (horizontal)
         {
@@ -51,14 +52,6 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
         {
             m_VirtualContentOffset.y = virtualOffsetSize;
         }
-    }
-
-    protected override void Refill(bool forwards)
-    {
-        if (forwards)
-            InstantiateForwards();
-        else
-            InstantiateBackwards();
     }
 
     protected override void SetNormalizedPosition(float value)
@@ -117,48 +110,49 @@ public class LoopScrollFixed : LoopScrollRowOrColumn
     {
         bool hl = horizontal;
         float offsetSize = size + spacing;
-        var offset = hl ? offsetSize : -offsetSize;
-
-        float virtualPosition, virtualOffset;
         if (hl)
         {
-            virtualOffset = m_VirtualContentOffset.x;
-            virtualPosition = content.anchoredPosition.x + virtualOffset;
+            var virtualOffset = m_VirtualContentOffset.x;
+            var virtualPosition = content.anchoredPosition.x + virtualOffset;
+            startIndex = Mathf.FloorToInt((-(virtualPosition + padding.x)) / offsetSize);
+            startPosition = startIndex * offsetSize + padding.x + virtualOffset;
+            endPosition = startPosition - spacing;
         }
         else
         {
-            virtualOffset = m_VirtualContentOffset.y;
-            virtualPosition = content.anchoredPosition.y + virtualOffset;
+            var virtualOffset = m_VirtualContentOffset.y;
+            var virtualPosition = content.anchoredPosition.y + virtualOffset;
+            startIndex = Mathf.FloorToInt((virtualPosition - padding.x) / offsetSize);
+            startPosition = -startIndex * offsetSize - padding.x + virtualOffset;
+            endPosition = startPosition + spacing;
         }
-
-        startIndex = Mathf.FloorToInt(Math.Abs(virtualPosition) / offsetSize);
         endIndex = startIndex - 1;
-        startPosition = startIndex * offset + virtualOffset;
-        endPosition = startPosition + (hl ? -spacing : spacing);
     }
 
     private void OnBackwardsJump()
     {
         bool hl = horizontal;
         float offsetSize = size + spacing;
-        var offset = hl ? offsetSize : -offsetSize;
 
-        float virtualPosition, virtualOffset;
         if (hl)
         {
-            virtualOffset = m_VirtualContentOffset.x;
-            virtualPosition = content.anchoredPosition.x + virtualOffset - alongViewSize;
+            var virtualOffset = m_VirtualContentOffset.x;
+            var virtualPosition = content.anchoredPosition.x + virtualOffset;
+            startIndex = Mathf.CeilToInt(-(virtualPosition - alongViewSize + padding.x) / offsetSize);
+            startPosition = startIndex * offsetSize + padding.x + virtualOffset;
+            endPosition = startPosition - spacing;
+
         }
         else
         {
-            virtualOffset = m_VirtualContentOffset.y;
-            virtualPosition = content.anchoredPosition.y + virtualOffset + alongViewSize;
+            var virtualOffset = m_VirtualContentOffset.y;
+            var virtualPosition = content.anchoredPosition.y + virtualOffset;
+            startIndex = Mathf.CeilToInt((virtualPosition + alongViewSize - padding.x) / offsetSize);
+            startPosition = -startIndex * offsetSize - padding.x + virtualOffset;
+            endPosition = startPosition + spacing;
         }
 
-        startIndex = Mathf.CeilToInt(Math.Abs(virtualPosition) / offsetSize);
         endIndex = startIndex - 1;
-        startPosition = startIndex * offset + virtualOffset;
-        endPosition = startPosition + (hl ? -spacing : spacing);
     }
 
     protected override float GetItemSize(RectTransform item, int index, bool isInstantiate)

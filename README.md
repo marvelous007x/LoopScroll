@@ -32,7 +32,7 @@ If element size is fixed, use `LoopScrollFixed`, you should set its size field, 
 
 - Probably will not implement for both directions since rare use cases.
 
-- Padding is not added, I'll see if it's that necessary, maybe add it someday later. Only spacing is offered now.
+- Just padding of scroll moving direction is now not added, and probably will not afterwards.
 
 - DO NOT CHANGE element position along loop direction.
 

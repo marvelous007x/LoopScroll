@@ -7,24 +7,37 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
     protected override void OnSetup(bool forwards)
     {
         base.OnSetup(forwards);
+        var hl = horizontal;
         if (forwards)
         {
-            startPosition = 0;
-            endPosition = horizontal ? -spacing : spacing;
-        }
-        else if (horizontal)
-        {
-            endPosition = alongViewSize;
-            startPosition = endPosition + spacing;
+            if (hl)
+            {
+                startPosition = padding.x;
+                endPosition = startPosition - spacing;
+            }
+            else
+            {
+                startPosition = -padding.x;
+                endPosition = startPosition + spacing;
+            }
+
         }
         else
         {
-            endPosition = -alongViewSize;
-            startPosition = endPosition - spacing;
+            if (horizontal)
+            {
+                endPosition = alongViewSize - padding.y;
+                startPosition = endPosition + spacing;
+            }
+            else
+            {
+                endPosition = -alongViewSize + padding.y;
+                startPosition = endPosition - spacing;
+            }
         }
     }
 
-    protected void ReleaseForwards(in Vector2 position)
+    protected override void ReleaseForwards(in Vector2 position)
     {
         var count = content.childCount;
         if (count == 0) return;
@@ -59,7 +72,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         }
     }
 
-    protected void InstantiateForwards()
+    protected override void InstantiateForwards()
     {
         if (totalCount == 0) return;
         bool hl = horizontal;
@@ -109,7 +122,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         }
     }
 
-    protected void ReleaseBackwards(in Vector2 position)
+    protected override void ReleaseBackwards(in Vector2 position)
     {
         var count = content.childCount;
         if (count == 0) return;
@@ -146,7 +159,7 @@ public abstract class LoopScrollRowOrColumn : LoopScrollHorizontalOrVertical
         }
     }
 
-    protected void InstantiateBackwards()
+    protected override void InstantiateBackwards()
     {
         if (totalCount == 0) return;
         bool hl = horizontal;
